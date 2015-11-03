@@ -9,6 +9,7 @@
   [tokens startIndex direction]
   (loop [i startIndex c 0]
     (let [chr (get tokens i)]
+      (assert (not (= chr nil)))
       (cond (= chr "[") (if (= c -1) (inc i) (recur (direction i) (inc c)))
             (= chr "]") (if (= c 1) (inc i) (recur (direction i) (dec c)))
             :else (recur (direction i) c)))))
