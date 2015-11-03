@@ -5,31 +5,28 @@
   [x]
   (into [] (map (comp str identity) x)))
 
+(defn- matching-bracket
+  [tokens startIndex direction]
+  (loop [i startIndex c 0]
+    (let [chr (get tokens i)]
+      (cond (= chr "[") (if (= c -1) (inc i) (recur (direction i) (inc c)))
+            (= chr "]") (if (= c 1) (inc i) (recur (direction i) (dec c)))
+            :else (recur (direction i) c)))))
+
 (defn- matching-close
-  [x openI]
-  (loop [i openI c 0]
-    (let [chr (get x i)]
-      (assert (not (= chr nil)))
-      (println i c chr)
-      (cond (= chr "[") (recur (inc i) (inc c))
-            (= chr "]") (if (= c 1) (inc i) (recur (inc i) (dec c)))
-            :else (recur (inc i) c)))))
+  [tokens openIndex]
+  (matching-bracket tokens openIndex inc))
 
 (defn- matching-open
-  [x closeI]
-  (loop [i closeI c 0]
-    (let [chr (get x i)]
-      (assert (not (= chr nil)))
-      (cond (= chr "]") (recur (dec i) (inc c))
-            (= chr "[") (if (= c 1) (inc i) (recur (dec i) (dec c)))
-            :else (recur (dec i) c)))))
-
-(defn- read-memory [memory pointer] (or (get memory pointer) 0))
+  [tokens closeIndex]
+  (matching-bracket tokens closeIndex dec))
 
 (defn- pad-zeros
   [memory lastIndex]
   (let [deficit (- (inc lastIndex) (count memory))]
     (vec (concat memory (repeat deficit 0)))))
+
+(defn- read-memory [memory pointer] (or (get memory pointer) 0))
 
 (defn- write-memory
   [memory pointer v]
