@@ -21,20 +21,13 @@
   [tokens closeIndex]
   (matching-bracket tokens closeIndex dec))
 
-(defn- pad-zeros
-  [memory lastIndex]
-  (let [deficit (- (inc lastIndex) (count memory))]
-    (vec (concat memory (repeat deficit 0)))))
-
-(defn- read-memory [memory pointer] (or (get memory pointer) 0))
-
 (defn- write-memory
   [memory pointer v]
-  (assoc (pad-zeros memory pointer) pointer v))
+  (concat (take pointer memory) (list v) (drop (inc pointer) memory)))
 
 (defn- add-memory
-  [memory pointer s]
-  (write-memory memory pointer (+ s (read-memory memory pointer))))
+  [m p s]
+  (write-memory m p (+ s (nth m p))))
 
 (defn- run-machine
   [tokens' ip' memory' pointer' input']
@@ -46,20 +39,20 @@
             (= inst "+") (recur tokens (inc ip) (add-memory memory pointer 1) pointer input)
             (= inst "-") (recur tokens (inc ip) (add-memory memory pointer -1) pointer input)
             (= inst ".") (do
-                           (print (char (read-memory memory pointer)))
+                           (print (char (nth memory pointer)))
                            (recur tokens (inc ip) memory pointer input))
             (= inst ",") (if (empty? input)
                              (recur tokens (inc ip) (write-memory memory pointer 0) pointer input)
-                             (let [c (read-memory memory pointer) ni (rest input)]
+                             (let [c (nth memory pointer) ni (rest input)]
                                (recur tokens (inc ip) (write-memory memory pointer c) pointer ni)))
-            (= inst "[") (if (= 0 (read-memory memory pointer))
+            (= inst "[") (if (= 0 (nth memory pointer))
                              (recur tokens (matching-close tokens ip) memory pointer input)
                              (recur tokens (inc ip) memory pointer input))
-            (= inst "]") (if (= 0 (read-memory memory pointer))
+            (= inst "]") (if (= 0 (nth memory pointer))
                              (recur tokens (inc ip) memory pointer input)
                              (recur tokens (matching-open tokens ip) memory pointer input))
             :else (recur tokens (inc ip) memory pointer input)))))
 
 (defn -main
   [program & input]
-  (run-machine (tokenize (slurp program)) 0 [] 0 (apply str input)))
+  (run-machine (tokenize (slurp program)) 0 (repeat 0) 0 (apply str input)))
