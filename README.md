@@ -6,4 +6,7 @@ A brainfuck interpreter, written in Clojure.
 
 The usage is `lein run <program.bf> [stand input]`. For example:
 
-    $ lein run reverse.bf "some input here"
+    $ lein run examples/echo.bf "hi there"
+    hi there
+    $ lein run examples/hello_world.bf
+    Hello World!
