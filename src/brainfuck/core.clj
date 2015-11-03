@@ -1,5 +1,4 @@
 (ns brainfuck.core)
-(require '[clojure.string :as str])
 
 (defn- matching-bracket
   [tokens startIndex direction]
@@ -27,28 +26,27 @@
   (write-memory m p (+ s (nth m p))))
 
 (defn- run-machine
-  [tokens' ip' memory' pointer' input']
-  (loop [tokens tokens' ip ip' memory memory' pointer pointer' input input']
-    (let [inst (get tokens ip)]
-      (cond (= inst nil) nil
-            (= inst \>) (recur tokens (inc ip) memory (inc pointer) input)
-            (= inst \<) (recur tokens (inc ip) memory (dec pointer) input)
-            (= inst \+) (recur tokens (inc ip) (add-memory memory pointer 1) pointer input)
-            (= inst \-) (recur tokens (inc ip) (add-memory memory pointer -1) pointer input)
-            (= inst \.) (do
-                          (print (char (nth memory pointer)))
+  [tokens ip memory pointer input]
+  (let [inst (get tokens ip)]
+    (cond (= inst nil) nil
+          (= inst \>) (recur tokens (inc ip) memory (inc pointer) input)
+          (= inst \<) (recur tokens (inc ip) memory (dec pointer) input)
+          (= inst \+) (recur tokens (inc ip) (add-memory memory pointer 1) pointer input)
+          (= inst \-) (recur tokens (inc ip) (add-memory memory pointer -1) pointer input)
+          (= inst \.) (do
+                        (print (char (nth memory pointer)))
+                        (recur tokens (inc ip) memory pointer input))
+          (= inst \,) (if (empty? input)
+                          (recur tokens (inc ip) (write-memory memory pointer 0) pointer input)
+                          (let [c (int (first input)) ni (rest input)]
+                            (recur tokens (inc ip) (write-memory memory pointer c) pointer ni)))
+          (= inst \[) (if (= 0 (nth memory pointer))
+                          (recur tokens (matching-close tokens ip) memory pointer input)
                           (recur tokens (inc ip) memory pointer input))
-            (= inst \,) (if (empty? input)
-                            (recur tokens (inc ip) (write-memory memory pointer 0) pointer input)
-                            (let [c (int (first input)) ni (rest input)]
-                              (recur tokens (inc ip) (write-memory memory pointer c) pointer ni)))
-            (= inst \[) (if (= 0 (nth memory pointer))
-                            (recur tokens (matching-close tokens ip) memory pointer input)
-                            (recur tokens (inc ip) memory pointer input))
-            (= inst \]) (if (= 0 (nth memory pointer))
-                            (recur tokens (inc ip) memory pointer input)
-                            (recur tokens (matching-open tokens ip) memory pointer input))
-            :else (recur tokens (inc ip) memory pointer input)))))
+          (= inst \]) (if (= 0 (nth memory pointer))
+                          (recur tokens (inc ip) memory pointer input)
+                          (recur tokens (matching-open tokens ip) memory pointer input))
+          :else (recur tokens (inc ip) memory pointer input))))
 
 (defn -main
   [program & input]
