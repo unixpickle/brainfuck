@@ -38,25 +38,26 @@
 (defn- machine-loop
   [tokens ip memory pointer input]
   (let [inst (get tokens ip)]
-    (cond (= inst nil) nil
-          (= inst \>) (recur tokens (inc ip) memory (inc pointer) input)
-          (= inst \<) (recur tokens (inc ip) memory (dec pointer) input)
-          (= inst \+) (recur tokens (inc ip) (add-memory memory pointer 1) pointer input)
-          (= inst \-) (recur tokens (inc ip) (add-memory memory pointer -1) pointer input)
-          (= inst \.) (do
-                        (print (char (read-memory memory pointer)))
-                        (recur tokens (inc ip) memory pointer input))
-          (= inst \,) (if (empty? input)
-                          (recur tokens (inc ip) (write-memory memory pointer 0) pointer input)
-                          (let [c (int (first input)) ni (rest input)]
-                            (recur tokens (inc ip) (write-memory memory pointer c) pointer ni)))
-          (= inst \[) (if (= 0 (read-memory memory pointer))
-                          (recur tokens (matching-close tokens ip) memory pointer input)
-                          (recur tokens (inc ip) memory pointer input))
-          (= inst \]) (if (= 0 (read-memory memory pointer))
-                          (recur tokens (inc ip) memory pointer input)
-                          (recur tokens (matching-open tokens ip) memory pointer input))
-          :else (recur tokens (inc ip) memory pointer input))))
+    (case inst
+          nil nil
+          \> (recur tokens (inc ip) memory (inc pointer) input)
+          \< (recur tokens (inc ip) memory (dec pointer) input)
+          \+ (recur tokens (inc ip) (add-memory memory pointer 1) pointer input)
+          \- (recur tokens (inc ip) (add-memory memory pointer -1) pointer input)
+          \. (do
+               (print (char (read-memory memory pointer)))
+               (recur tokens (inc ip) memory pointer input))
+          \, (if (empty? input)
+                 (recur tokens (inc ip) (write-memory memory pointer 0) pointer input)
+                 (let [c (int (first input)) ni (rest input)]
+                   (recur tokens (inc ip) (write-memory memory pointer c) pointer ni)))
+          \[ (if (= 0 (read-memory memory pointer))
+                 (recur tokens (matching-close tokens ip) memory pointer input)
+                 (recur tokens (inc ip) memory pointer input))
+          \] (if (= 0 (read-memory memory pointer))
+                 (recur tokens (inc ip) memory pointer input)
+                 (recur tokens (matching-open tokens ip) memory pointer input))
+          (recur tokens (inc ip) memory pointer input))))
 
 (defn run-machine
   [code input]
