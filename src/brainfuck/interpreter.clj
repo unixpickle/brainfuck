@@ -17,13 +17,23 @@
   [tokens closeIndex]
   (matching-bracket tokens closeIndex dec))
 
+(defn- pad-zeroes
+  [m addr]
+  (if (<= (count m) addr)
+      (recur (conj m 0) addr)
+      m))
+
 (defn- write-memory
-  [memory pointer v]
-  (concat (take pointer memory) (list v) (drop (inc pointer) memory)))
+  [m addr value]
+  (assoc (pad-zeroes m addr) addr value))
+
+(defn- read-memory
+  [m addr]
+  (or (get m addr) 0))
 
 (defn- add-memory
-  [m p s]
-  (write-memory m p (+ s (nth m p))))
+  [m addr value]
+  (write-memory m addr (+ value (read-memory m addr))))
 
 (defn- machine-loop
   [tokens ip memory pointer input]
@@ -34,20 +44,20 @@
           (= inst \+) (recur tokens (inc ip) (add-memory memory pointer 1) pointer input)
           (= inst \-) (recur tokens (inc ip) (add-memory memory pointer -1) pointer input)
           (= inst \.) (do
-                        (print (char (nth memory pointer)))
+                        (print (char (read-memory memory pointer)))
                         (recur tokens (inc ip) memory pointer input))
           (= inst \,) (if (empty? input)
                           (recur tokens (inc ip) (write-memory memory pointer 0) pointer input)
                           (let [c (int (first input)) ni (rest input)]
                             (recur tokens (inc ip) (write-memory memory pointer c) pointer ni)))
-          (= inst \[) (if (= 0 (nth memory pointer))
+          (= inst \[) (if (= 0 (read-memory memory pointer))
                           (recur tokens (matching-close tokens ip) memory pointer input)
                           (recur tokens (inc ip) memory pointer input))
-          (= inst \]) (if (= 0 (nth memory pointer))
+          (= inst \]) (if (= 0 (read-memory memory pointer))
                           (recur tokens (inc ip) memory pointer input)
                           (recur tokens (matching-open tokens ip) memory pointer input))
           :else (recur tokens (inc ip) memory pointer input))))
 
 (defn run-machine
   [code input]
-  (machine-loop code 0 (repeat 0) 0 input))
+  (machine-loop code 0 [] 0 input))
