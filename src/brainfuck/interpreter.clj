@@ -58,7 +58,7 @@
                (print (char (read-memory memory pointer)))
                (recur tokens (inc ip) memory pointer input cache))
           \, (if (empty? input)
-                 (recur tokens (inc ip) (write-memory memory pointer 0) pointer input cache)
+                 (recur tokens (inc ip) memory pointer input cache)
                  (let [c (int (first input)) ni (rest input)]
                    (recur tokens (inc ip) (write-memory memory pointer c) pointer ni cache)))
           \[ (if (= 0 (read-memory memory pointer))
