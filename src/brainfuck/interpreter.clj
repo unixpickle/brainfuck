@@ -17,6 +17,16 @@
   [tokens closeIndex]
   (matching-bracket tokens closeIndex dec))
 
+(defn- matching-cache
+  [tokens]
+  (loop [v (vec (repeat (count tokens) 0)) i 0]
+    (if (= i (count tokens))
+        v
+        (case (get tokens i)
+              \[ (recur (assoc v i (matching-close tokens i)) (inc i))
+              \] (recur (assoc v i (matching-open tokens i)) (inc i))
+              (recur v (inc i))))))
+
 (defn- pad-zeroes
   [m addr]
   (if (<= (count m) addr)
@@ -36,29 +46,29 @@
   (write-memory m addr (+ value (read-memory m addr))))
 
 (defn- machine-loop
-  [tokens ip memory pointer input]
+  [tokens ip memory pointer input cache]
   (let [inst (get tokens ip)]
     (case inst
           nil nil
-          \> (recur tokens (inc ip) memory (inc pointer) input)
-          \< (recur tokens (inc ip) memory (dec pointer) input)
-          \+ (recur tokens (inc ip) (add-memory memory pointer 1) pointer input)
-          \- (recur tokens (inc ip) (add-memory memory pointer -1) pointer input)
+          \> (recur tokens (inc ip) memory (inc pointer) input cache)
+          \< (recur tokens (inc ip) memory (dec pointer) input cache)
+          \+ (recur tokens (inc ip) (add-memory memory pointer 1) pointer input cache)
+          \- (recur tokens (inc ip) (add-memory memory pointer -1) pointer input cache)
           \. (do
                (print (char (read-memory memory pointer)))
-               (recur tokens (inc ip) memory pointer input))
+               (recur tokens (inc ip) memory pointer input cache))
           \, (if (empty? input)
-                 (recur tokens (inc ip) (write-memory memory pointer 0) pointer input)
+                 (recur tokens (inc ip) (write-memory memory pointer 0) pointer input cache)
                  (let [c (int (first input)) ni (rest input)]
-                   (recur tokens (inc ip) (write-memory memory pointer c) pointer ni)))
+                   (recur tokens (inc ip) (write-memory memory pointer c) pointer ni cache)))
           \[ (if (= 0 (read-memory memory pointer))
-                 (recur tokens (matching-close tokens ip) memory pointer input)
-                 (recur tokens (inc ip) memory pointer input))
+                 (recur tokens (get cache ip) memory pointer input cache)
+                 (recur tokens (inc ip) memory pointer input cache))
           \] (if (= 0 (read-memory memory pointer))
-                 (recur tokens (inc ip) memory pointer input)
-                 (recur tokens (matching-open tokens ip) memory pointer input))
-          (recur tokens (inc ip) memory pointer input))))
+                 (recur tokens (inc ip) memory pointer input cache)
+                 (recur tokens (get cache ip) memory pointer input cache))
+          (recur tokens (inc ip) memory pointer input cache))))
 
 (defn run-machine
   [code input]
-  (machine-loop code 0 [] 0 input))
+  (machine-loop code 0 [] 0 input (matching-cache code)))
