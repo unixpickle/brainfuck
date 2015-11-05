@@ -28,15 +28,15 @@
             (repeat 16 "+") "[->" (repeat 16 "+") "<]>"
             "[->+" (repeat (dec reg-count) ">>>>+")
             (repeat (dec reg-count) "<<<<") "<]"
-            ">" (repeat reg-count ">>>>") "++<"))
+            ">>" (repeat reg-count "+>++>>>") "<++<"))
 
-(def- reg-inc
+(def ^:private reg-inc
   "Increment the current register."
   (str "+>-[>-]"            ; inc v, dec comp, set flag to 0 if comp isn't 0
-       ">--[++>--]<"        ; seek to flag
+       ">--[++>--]++<"      ; seek to flag
        "[-<<[->+<]>>]+<<")) ; if flag!=0, set v to 0 and comp to 256
 
-(def- reg-dec
+(def ^:private reg-dec
   "Decrement the current register."
   (str "[>>-]"              ; set flag to 0 if v=0
        ">--[++>>--]++<"     ; seek to the flag
@@ -47,7 +47,7 @@
   "Generate a string of <'s or >'s."
   [start end]
   (let [x (- end start)]
-    (deep-str (repeat x ">") (repeat -x "<"))))
+    (deep-str (repeat x ">") (repeat (- x) "<"))))
 
 (defn- backup-reg
   "Backup the current register to a scratch byte.
