@@ -53,9 +53,19 @@
 (def write-unit
   "Copy the value from the B register into the memory unit referenced by the A register.
    This code will not modify the A or B registers."
-  (str goto-deref ">+<"                       ; Set the deref-flag of the target unit to 1
+  (str goto-deref ">+<[-]"                    ; Setup the target unit
        (goto-reg 1) "[-]>[-]"                 ; Zero out S1 and S2
        ">>>[-<<<+<+>>>>]"                     ; Move B into S1 and S2
        "<<<<[->>>>+<<<<]"                     ; Move S1 back into B
        ">[->>>>>>-[+>>-]+<+" (goto-reg 2) "]" ; Move S2 into the target unit
        ">>>>>>-[+>>-]<"))                     ; Unset the deref-flag of the target unit
+
+(def read-unit
+  "Copy the value from the memory unit referenced by the A register into the B register.
+   This code will not modify the A register or the referenced memory cell."
+   (str (set-reg 2 0)                           ; Zero out S2.
+        goto-deref ">+<"                        ; Set the deref-flag of the target unit to 1.
+        "[-" (goto-reg 5) "+<<<+>>>>-[+>>-]+<]" ; Move target unit into B and S2
+        (goto-reg 2) "[->>>>-[+>>-]+<+"
+        (goto-reg 2) "]"                        ; Move S2 back into the target unit
+        ">>>>>>-[+>>-]<"))                      ; Unset the deref-flag of the target unit
