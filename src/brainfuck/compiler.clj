@@ -56,7 +56,7 @@
   [s0 s1]
   (let [go-scratch-end "<<[<<<<]<<"
         go-s1 (str go-scratch-end (seek scratch-size s1))
-        go-reg (str (seek s1 (+ scratch-size 7)) "[>>>>]<<")]
+        go-reg (str (seek s1 (+ scratch-size 6)) "[>>>>]<<")]
     (str ">>-<<"
          "[-" go-scratch-end
          (seek scratch-size s0) "+"
