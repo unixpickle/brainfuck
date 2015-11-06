@@ -49,10 +49,11 @@
   (let [x (- end start)]
     (deep-str (repeat x ">") (repeat (- x) "<"))))
 
-(defn- backup-reg
-  "Backup the current register to a scratch byte.
+(defn- reg-to-scratch
+  "Copy the current register to a scratch byte.
    Since copying a value requires two destinations, this uses two scratch bytes.
-   The first scratch byte is the backup, the second is left at zero."
+   The first scratch byte is the backup, the second is left at zero.
+   Both scratch bytes must start at zero before the call."
   [s0 s1]
   (let [go-scratch-end "<<[<<<<]<<"
         go-s1 (str go-scratch-end (seek scratch-size s1))
@@ -64,4 +65,4 @@
          (seek s0 s1) "+"
          go-reg "]"
          go-s1 "[-" go-reg "+" go-s1 "]"
-         go-reg-flag ">>+<<")))
+         go-reg-flag "+<<")))
