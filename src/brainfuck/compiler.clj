@@ -56,11 +56,21 @@
   [s0 s1]
   (let [go-scratch-end "<<[<<<<]<<"
         go-s1 (str go-scratch-end (seek scratch-size s1))
-        go-reg (str (seek s1 (+ scratch-size 6)) "[>>>>]<<")]
+        go-reg-flag (str (seek s1 (+ scratch-size 6)) "[>>>>]")
+        go-reg (str go-reg-flag "<<")]
     (str ">>-<<"
          "[-" go-scratch-end
          (seek scratch-size s0) "+"
          (seek s0 s1) "+"
          go-reg "]"
          go-s1 "[-" go-reg "+" go-s1 "]"
-         go-reg ">>+<<")))
+         go-reg-flag ">>+<<")))
+
+(defn- restore-reg
+  "Restore the current register from a scratch byte."
+  [s]
+  (let [go-scratch-end "<<[<<<<]<<"
+        go-s (str go-scratch-end (seek scratch-size s))
+        go-reg-flag (str (seek s (+ scratch-size 6)) "[>>>>]")
+        go-reg (str go-reg-flag "<<")]
+    (str ">>-<<" go-s "[-" go-reg "+" go-s "]" go-reg-flag "+<<")))
