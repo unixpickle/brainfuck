@@ -2,7 +2,7 @@
 
 (defn- deep-str
   [& x]
-  (apply str (map (partial apply str) x)))
+  (apply str (flatten x)))
 
 (defn- seek
   "Generate a string of <'s or >'s."
