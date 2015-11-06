@@ -27,7 +27,6 @@
           suffix '(1 2 0 2)
           expected (map #(concat prefix regs (list % (- 256 %)) suffix)
                         '(1 2 0 3))
-          mem-len (+ scratch-size (* (inc reg-count) 4))
+          mem-len (+ 4 scratch-size (* (inc reg-count) 4))
           actual (map #(take mem-len (:memory (run-machine % ""))) programs)]
-      (println (nth programs 0))
       (dorun (map #(is (= %1 %2)) actual expected)))))
