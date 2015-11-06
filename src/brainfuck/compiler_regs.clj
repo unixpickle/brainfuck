@@ -80,4 +80,4 @@
   "Set the value of a register to a hard-coded number."
   [reg val]
   ; TODO: shrink the code that this generates.
-  (with-reg reg reg-reset (repeat val "+")))
+  (with-reg reg reg-reset (repeat val "+>-<")))

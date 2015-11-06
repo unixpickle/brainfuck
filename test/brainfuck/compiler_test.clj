@@ -70,16 +70,40 @@
     (let [lastReg (dec reg-count)
           sources [0 2 1 lastReg]
           destinations [lastReg 1 2 0]
+          start-vals [1 2 3 4]
           programs (map #(deep-str initialize-state
                                    (repeat (- reg-count %2) "<<<<")
                                    (repeat 17 reg-inc)
                                    (repeat (- reg-count %2) ">>>>")
+                                   (repeat (- reg-count %1) "<<<<")
+                                   (repeat %3 reg-inc)
+                                   (repeat (- reg-count %1) ">>>>")
                                    (mov-reg %1 %2))
-                        destinations sources)
-          actual (map #(:memory (run-machine % "")) programs)
-          pointers (map #(:pointer (run-machine % "")) programs)
+                        destinations sources start-vals)
+          results (map #(run-machine % "") programs)
+          actual (map :memory results)
+          pointers (map :pointer results)
           expected-pointer (+ 4 scratch-size (* 4 reg-count))
           expected (map #(-> initial-state (state-set-reg %1 17) (state-set-reg %2 17))
                         sources destinations)]
+      (is (= pointers (repeat (count pointers) expected-pointer)))
+      (are-states-equal actual expected))))
+
+(deftest set-reg-test
+  (testing "set-reg"
+    (let [regs (range reg-count)
+          vals (take (count regs) (take-nth 13 (range 256)))
+          start-vals (repeatedly (count vals) rand)
+          programs (map #(deep-str initialize-state
+                                   (repeat (- reg-count %1) "<<<<")
+                                   (repeat %3 reg-inc)
+                                   (repeat (- reg-count %1) ">>>>")
+                                   (set-reg %1 %2))
+                        regs vals start-vals)
+          results (map #(run-machine % "") programs)
+          actual (map :memory results)
+          pointers (map :pointer results)
+          expected-pointer (+ 4 scratch-size (* 4 reg-count))
+          expected (map #(state-set-reg initial-state %1 %2) regs vals)]
       (is (= pointers (repeat (count pointers) expected-pointer)))
       (are-states-equal actual expected))))
