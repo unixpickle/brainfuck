@@ -3,7 +3,7 @@
             [brainfuck.compiler :refer :all]
             [brainfuck.interpreter :refer :all]))
 
-(def reg-inc #'brainfuck.compiler/reg-inc)
+(def reg-inc @#'brainfuck.compiler/reg-inc)
 
 (deftest initialize-state-test
   (testing "initialize-state"
@@ -29,4 +29,5 @@
                         '(1 2 0 3))
           mem-len (+ scratch-size (* (inc reg-count) 4))
           actual (map #(take mem-len (:memory (run-machine % ""))) programs)]
+      (println (nth programs 0))
       (dorun (map #(is (= %1 %2)) actual expected)))))
