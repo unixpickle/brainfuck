@@ -68,8 +68,8 @@
   (seek (* 4 start) (* 4 end)))
 
 (defn mov-reg
-  "Copy the value of the first register to the second register."
-  [source destination]
+  "Copy the value of the second register to the first register."
+  [destination source]
   (with-reg source
             (reg-to-scratch (dec scratch-size) (- scratch-size 2))
             (seek-between-regs source destination)

@@ -1,8 +1,9 @@
 (ns brainfuck.compiler-test
   (:require [clojure.test :refer :all]
-            [brainfuck.compiler :refer [initialize-state reg-count scratch-size]]
+            [brainfuck.compiler :refer :all]
             [brainfuck.interpreter :refer :all]))
 
+(def deep-str #'brainfuck.compiler/deep-str)
 (def reg-inc @#'brainfuck.compiler/reg-inc)
 (def reg-dec @#'brainfuck.compiler/reg-dec)
 (def reg-to-scratch #'brainfuck.compiler/reg-to-scratch)
@@ -57,9 +58,28 @@
 (deftest reg-to-scratch-test
   (testing "reg-to-scratch"
     (let [s0 [0 1 2 2] s1 [1 2 0 1]
-          init (str initialize-state "<<<<" (apply str (repeat 100 reg-inc)))
+          init (deep-str initialize-state "<<<<" (repeat 100 reg-inc))
           programs (map #(str init (reg-to-scratch %1 %2)) s0 s1)
           before (state-set-reg initial-state (dec reg-count) 100)
           expected (map #(state-set-scratch before % 100) s0)
           actual (map #(:memory (run-machine % "")) programs)]
+      (are-states-equal actual expected))))
+
+(deftest mov-reg-test
+  (testing "mov-reg"
+    (let [lastReg (dec reg-count)
+          sources [0 2 1 lastReg]
+          destinations [lastReg 1 2 0]
+          programs (map #(deep-str initialize-state
+                                   (repeat (- reg-count %2) "<<<<")
+                                   (repeat 17 reg-inc)
+                                   (repeat (- reg-count %2) ">>>>")
+                                   (mov-reg %1 %2))
+                        destinations sources)
+          actual (map #(:memory (run-machine % "")) programs)
+          pointers (map #(:pointer (run-machine % "")) programs)
+          expected-pointer (+ 4 scratch-size (* 4 reg-count))
+          expected (map #(-> initial-state (state-set-reg %1 17) (state-set-reg %2 17))
+                        sources destinations)]
+      (is (= pointers (repeat (count pointers) expected-pointer)))
       (are-states-equal actual expected))))
