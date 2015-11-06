@@ -49,7 +49,7 @@
   [tokens ip memory pointer input cache]
   (let [inst (get tokens ip)]
     (case inst
-          nil nil
+          nil {:memory memory :pointer pointer}
           \> (recur tokens (inc ip) memory (inc pointer) input cache)
           \< (recur tokens (inc ip) memory (dec pointer) input cache)
           \+ (recur tokens (inc ip) (add-memory memory pointer 1) pointer input cache)
