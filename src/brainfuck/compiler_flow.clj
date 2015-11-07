@@ -42,3 +42,9 @@
    This is equivalent to moving the register into the return value register."
   [reg]
   (if (= reg return-value-reg) "" (mov-reg return-value-reg reg)))
+
+(defn return-num
+  "Return a hard-coded number.
+   This is equivalent to setting the return value register to the given value."
+  [value]
+  (set-reg return-value-reg value))
