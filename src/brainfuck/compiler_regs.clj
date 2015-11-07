@@ -1,20 +1,20 @@
 (ns brainfuck.compiler
   (:require [clojure.string]))
 
-(def ^:private reg-inc
+(def ^:private inc-current-reg
   "Increment the current register."
   (str "+>-[>-]"            ; inc v, dec comp, set flag to 0 if comp isn't 0
        ">--[++>--]++<"      ; seek to flag
        "[-<<[->+<]>>]+<<")) ; if flag!=0, set v to 0 and comp to 256
 
-(def ^:private reg-dec
+(def ^:private dec-current-reg
   "Decrement the current register."
   (str "[>>-]"              ; set flag to 0 if v=0
        ">--[++>>--]++<"     ; seek to the flag
        "[-<[-<+>]>]+<"      ; if flag=1, set v to 256 and comp to 0
        "+<-"))              ; inc comp, dec v
 
-(def ^:private reg-reset
+(def ^:private reset-current-reg
   "Zero out the current register."
   "[->+<]")
 
@@ -75,7 +75,7 @@
   (with-reg source
             (reg-to-scratch (dec scratch-size) (- scratch-size 2))
             (seek-between-regs source destination)
-            reg-reset
+            reset-current-reg
             (scratch-to-reg (dec scratch-size))))
 
 (defn- add-product-reg
@@ -102,4 +102,4 @@
 (defn set-reg
   "Set the value of a register to a hard-coded number."
   [reg val]
-  (with-reg reg reg-reset (short-add-code (mod val 256))))
+  (with-reg reg reset-current-reg (short-add-code (mod val 256))))

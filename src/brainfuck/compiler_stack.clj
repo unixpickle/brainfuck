@@ -15,7 +15,7 @@
 (defn pop-stack
   "Remove the last entry from the stack and copy its value into a register."
   [reg]
-  (str (with-reg reg reg-reset)
+  (str (with-reg reg reset-current-reg)
        seek-last-stack-entry
        ">[-]<"
        "[-" (seek-mem-to-reg reg) ">-<+" seek-reg-to-mem ">[>>>>]<]"))
