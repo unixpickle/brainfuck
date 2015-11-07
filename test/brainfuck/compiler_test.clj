@@ -91,9 +91,9 @@
 
 (deftest set-reg-test
   (testing "set-reg"
-    (let [regs (range reg-count)
-          vals (take (count regs) (take-nth 13 (range 256)))
-          start-vals (repeatedly (count vals) rand)
+    (let [vals (range 256)
+          regs (repeatedly (count vals) (partial rand-int reg-count))
+          start-vals (repeatedly (count vals) (partial rand-int 256))
           programs (map #(deep-str initialize-state
                                    (repeat (- reg-count %1) "<<<<")
                                    (repeat %3 reg-inc)

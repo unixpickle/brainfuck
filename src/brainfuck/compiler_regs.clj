@@ -1,4 +1,5 @@
-(ns brainfuck.compiler)
+(ns brainfuck.compiler
+  (:require [clojure.string]))
 
 (def ^:private reg-inc
   "Increment the current register."
@@ -76,8 +77,28 @@
             reg-reset
             (scratch-to-reg (dec scratch-size))))
 
+(defn- add-product-reg
+  "Adds the product of two integers the current register.
+   This assumes that the register will not overflow."
+  [big small]
+  (deep-str ">>" (repeat (- big 1) "+")
+            "[-<<" (repeat small "+") ">" (repeat small "-") ">]+<<"))
+
+(defn- short-add-code
+  "Add an integer to the current register.
+   This assumes that the register will not overflow."
+  [n]
+  (if (zero? n)
+      (deep-str ">" (repeat n "-") "<" (repeat n "+"))
+      (let [naive-code (deep-str ">" (repeat n "-") "<" (repeat n "+"))
+            big-factor (int (Math/sqrt (* 2 n)))
+            small-factor (int (/ n big-factor))
+            code (str (add-product-reg big-factor small-factor)
+                      (short-add-code (- n (* big-factor small-factor))))
+            trimmed-code (clojure.string/replace code #"(<>|<<>>)" "")]
+        (first (sort-by count [naive-code trimmed-code])))))
+
 (defn set-reg
   "Set the value of a register to a hard-coded number."
   [reg val]
-  ; TODO: shrink the code that this generates.
-  (with-reg reg reg-reset (repeat val "+>-<")))
+  (with-reg reg reg-reset (short-add-code (mod val 256))))
