@@ -58,6 +58,13 @@
   [state index]
   (-> state (state-memseek-zero) (state-memseek-up index)))
 
+(defn state-memwrite
+  [state value]
+  (loop [i (+ 7 scratch-size (* 4 (inc reg-count)))]
+    (if (= 1 (state-read-byte state i))
+        (recur (+ i 4))
+        (state-write-byte state (dec i) value))))
+
 (defn states-equal
   [s1 s2]
   (cond (< (count s1) (count s2)) (states-equal (concat s1 [0]) s2)
