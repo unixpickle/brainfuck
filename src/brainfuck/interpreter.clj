@@ -56,6 +56,7 @@
           \- (recur tokens (inc ip) (add-memory memory pointer -1) pointer input cache)
           \. (do
                (print (char (read-memory memory pointer)))
+               (flush)
                (recur tokens (inc ip) memory pointer input cache))
           \, (if (empty? input)
                  (recur tokens (inc ip) memory pointer input cache)

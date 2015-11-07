@@ -1,10 +1,8 @@
+(print-string "hi\n")
+
 (set-reg 0 1)
 (set-reg 3 10)
 (memwrite-bf (return-num 1))
-
-(print-string "current: ")
-(print-bf (add-bf (return-num 0x30) (memread)))
-(print-string "\n")
 
 (while-bf (return-num 1)
           (mov-reg 1 0)
