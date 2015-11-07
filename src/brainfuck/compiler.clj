@@ -1,4 +1,5 @@
-(ns brainfuck.compiler)
+(ns brainfuck.compiler
+  (:require [clojure.string]))
 
 ; This library generates code which operates on a fancy state.
 ; The state begins with several scratch bytes, followed by an array of registers
@@ -23,7 +24,7 @@
 (load "compiler_util" "compiler_regs" "compiler_stack" "compiler_mem" "compiler_flow"
       "compiler_math")
 
-(def initialize-state
+(def ^:private initialize-state
   "Initialize the state of the machine.
    This code should prefix all generated programs."
   (deep-str (repeat (+ 4 (dec scratch-size)) ">")
@@ -31,3 +32,21 @@
             "[->+" (repeat (dec reg-count) ">>>>+")
             (repeat (dec reg-count) "<<<<") "<]"
             ">>" (repeat reg-count "+>++>>>") "<++<"))
+
+(defn- remove-seek-redundancies
+  [code]
+  (let [reduced (clojure.string/replace code #"(<>|><)" "")]
+    (if (< (count reduced) (count code))
+        (recur reduced)
+        code)))
+
+(defn finalize-program
+  [& s]
+  (remove-seek-redundancies (deep-str initialize-state s)))
+
+(defn compile-code
+  [lisp-code]
+  (binding [*ns* *ns*]
+    (in-ns 'brainfuck.compiler)
+    (let [parsed (read-string (str "(brainfuck.compiler/finalize-program " lisp-code ")"))]
+      (eval parsed))))

@@ -1,6 +1,5 @@
 (ns brainfuck.compiler-test)
 
-(def deep-str #'brainfuck.compiler/deep-str)
 (def inc-current-reg @#'brainfuck.compiler/inc-current-reg)
 (def dec-current-reg @#'brainfuck.compiler/dec-current-reg)
 (def reg-to-scratch #'brainfuck.compiler/reg-to-scratch)
