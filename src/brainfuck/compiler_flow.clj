@@ -37,6 +37,12 @@
                    else-body
                    (set-reg return-value-reg 0)))))
 
+; TODO: optimize this.
+(defn if-not-bf
+  "Like if-bf, but the condition is logically negated before being processed."
+  ([condition if-body] (if-bf condition "" if-body))
+  ([condition if-body else-body] (if-bf condition else-body if-body)))
+
 (defn return-reg
   "Return the value of a register.
    This is equivalent to moving the register into the return value register."

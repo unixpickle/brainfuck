@@ -29,3 +29,24 @@
                        (state-set-reg return-value-reg 8))
           actual (:memory (run-machine program ""))]
       (is (states-equal actual expected)))))
+
+(deftest div-regs-test
+  (testing "div-regs"
+    (let [numerators [50 38 32 1 0 0 255 255]
+          denominators [7 2 17 10 5 0 16 0]
+          quotients (map #(if (zero? %2) 0 (int (/ %1 %2))) numerators denominators)
+          moduli (map #(if (zero? %2) 0 (mod %1 %2)) numerators denominators)
+          programs (map #(str initialize-state
+                              (set-reg 0 %1)
+                              (set-reg 1 %2)
+                              (div-regs 0 1 2 3)
+                              (return-num 0))
+                        numerators denominators)
+          expected (map #(-> initial-state
+                             (state-set-reg 0 %1)
+                             (state-set-reg 1 %2)
+                             (state-set-reg 2 %3)
+                             (state-set-reg 3 %4))
+                        numerators denominators quotients moduli)
+          actual (map :memory (map #(run-machine % "") programs))]
+      (are-states-equal actual expected))))
