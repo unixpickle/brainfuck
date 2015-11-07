@@ -17,7 +17,7 @@
 (def scratch-size 5)
 (def reg-count 10)
 
-(load "compiler_util" "compiler_regs" "compiler_stack")
+(load "compiler_util" "compiler_regs" "compiler_stack" "compiler_mem")
 
 (def initialize-state
   "Initialize the state of the machine.

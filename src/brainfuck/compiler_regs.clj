@@ -40,13 +40,17 @@
 (defn- scratch-to-reg
   "Copy a scratch byte into the current register.
    The current register must be set to zero before this call.
-   This will leave the tape pointed at the target register."
-  [s]
-  (let [go-scratch-end "<<[<<<<]<<"
-        go-s (str go-scratch-end (seek scratch-size s))
-        go-reg-flag (str (seek s (+ scratch-size 6)) "[>>>>]")
-        go-reg (str go-reg-flag "<<")]
-    (str ">>-<<" go-s "[-" go-reg "+>-<" go-s "]" go-reg-flag "+<<")))
+   This will leave the tape pointed at the target register.
+   If the second (optional) argument is false, this will not affect the
+   complement of the register."
+  ([s] (scratch-to-reg s true))
+  ([s do-sub]
+   (let [go-scratch-end "<<[<<<<]<<"
+         go-s (str go-scratch-end (seek scratch-size s))
+         go-reg-flag (str (seek s (+ scratch-size 6)) "[>>>>]")
+         go-reg (str go-reg-flag "<<")
+         add1 (if do-sub "+>-<" "+")]
+    (str ">>-<<" go-s "[-" go-reg add1 go-s "]" go-reg-flag "+<<"))))
 
 (defn- seek-mem-to-reg
   "Move from the memory cell portion of the tape to a given register."
