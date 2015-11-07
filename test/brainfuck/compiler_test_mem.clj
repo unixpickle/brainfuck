@@ -34,3 +34,14 @@
           exp-pointer (+ 4 scratch-size (* 4 reg-count))]
       (is (every? #(= % exp-pointer) pointers))
       (are-states-equal actual expected))))
+
+(deftest memseek-zero-test
+  (testing "memseek-zero"
+    (let [program (str initialize-state (set-reg 1 5) (memseek-up 1) memseek-zero)
+          expected (state-set-reg initial-state 1 5)
+          result (run-machine program "")
+          actual (:memory result)
+          pointer (:pointer result)
+          exp-pointer (+ 4 scratch-size (* 4 (+ 6 reg-count)))]
+      (is (= pointer exp-pointer))
+      (is (states-equal actual expected)))))
