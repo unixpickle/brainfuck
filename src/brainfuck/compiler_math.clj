@@ -34,7 +34,7 @@
       (str (first expressions))
       (str (first expressions)
            (push-stack return-value-reg)
-           (add-bf (rest expressions))
+           (apply add-bf (rest expressions))
            (pop-stack scratch-reg-1)
            (mov-reg scratch-reg-2 return-value-reg)
            (add-regs scratch-reg-1 scratch-reg-2 return-value-reg))))
