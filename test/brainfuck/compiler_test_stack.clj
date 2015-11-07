@@ -47,3 +47,22 @@
           pointer (:pointer result)]
       (is (= pointer (+ 4 scratch-size (* 4 (+ 2 reg-count)))))
       (is (states-equal actual expected)))))
+
+(deftest peak-stack-test
+  (testing "peak-stack"
+    (let [program (deep-str initialize-state
+                            (set-reg 0 17)
+                            (push-stack 0)
+                            (set-reg 0 49)
+                            (push-stack 0)
+                            (peak-stack 0 1)
+                            (peak-stack 1)
+                            (push-stack 1))
+          expected (-> initial-state
+                       (state-set-reg 0 17)
+                       (state-set-reg 1 49)
+                       (state-push-stack 17)
+                       (state-push-stack 49)
+                       (state-push-stack 49))
+          actual (:memory (run-machine program ""))]
+      (is (states-equal actual expected)))))
