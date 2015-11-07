@@ -4,7 +4,9 @@
   "Create a new entry on the stack and copy a register's value to it."
   [reg]
   (str (seek-mem-to-reg reg)
+       (reg-to-scratch (dec scratch-size) (- scratch-size 2))
        "[->+<" seek-reg-to-mem ">[>>>>]<+" (seek-mem-to-reg reg) "]"
+       (scratch-to-reg (dec scratch-size))
        seek-reg-to-mem ">[>>>>]+<"))
 
 (def ^:private seek-last-stack-entry

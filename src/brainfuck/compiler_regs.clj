@@ -51,7 +51,7 @@
 (defn- seek-mem-to-reg
   "Move from the memory cell portion of the tape to a given register."
   [r]
-  (deep-str ">--[++<--]++<" (repeat (- reg-count r) "<<<<")))
+  (deep-str ">--[++<<<<--]++<" (repeat (- reg-count r) "<<<<")))
 
 (def ^:private seek-reg-to-mem
   "Move from the current register to the first memory cell."

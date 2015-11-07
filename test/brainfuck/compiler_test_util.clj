@@ -6,14 +6,31 @@
         suffix '(0 2)]
     (concat prefix regs suffix)))
 
+(defn state-write-byte
+  [state idx val]
+  (if (< (count state) idx)
+      (state-write-byte (concat (vec state) [0]) idx val)
+      (assoc (vec state) idx val)))
+
+(defn state-read-byte
+  [state idx]
+  (or (get state idx) 0))
+
 (defn state-set-scratch
   [state idx val]
-  (seq (assoc (vec state) idx val)))
+  (state-write-byte state idx val))
 
 (defn state-set-reg
   [state idx val]
   (let [regIdx (+ 4 scratch-size (* 4 idx))]
-    (seq (assoc (vec state) regIdx val (inc regIdx) (- 256 val)))))
+    (assoc (vec state) regIdx val (inc regIdx) (- 256 val))))
+
+(defn state-push-stack
+  [state val]
+  (loop [i (+ 5 scratch-size (* 4 reg-count))]
+    (if (= 0 (state-read-byte state i))
+        (-> state (state-write-byte i 1) (state-write-byte (dec i) val))
+        (recur (+ i 4)))))
 
 (defn states-equal
   [s1 s2]

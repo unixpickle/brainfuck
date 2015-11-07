@@ -1,7 +1,4 @@
-(ns brainfuck.compiler-test
-  (:require [clojure.test :refer :all]
-            [brainfuck.compiler :refer :all]
-            [brainfuck.interpreter :refer :all]))
+(ns brainfuck.compiler-test)
 
 (def deep-str #'brainfuck.compiler/deep-str)
 (def inc-current-reg @#'brainfuck.compiler/inc-current-reg)
