@@ -49,17 +49,18 @@
     (str ">>-<<" go-s "[-" go-reg "+>-<" go-s "]" go-reg-flag "+<<")))
 
 (defn- seek-mem-to-reg
-  "Move from the memory cell portion of the tap to a given register."
+  "Move from the memory cell portion of the tape to a given register."
   [r]
   (deep-str ">--[++<--]++<" (repeat (- reg-count r) "<<<<")))
 
 (def ^:private seek-reg-to-mem
   "Move from the current register to the first memory cell."
-  ">>>[>>>>]<<<")
+  ">>[>>>>]<<")
 
 (defn- with-reg
-  "Seek from memory to a register, run some code, and then seek back to memory.
-   Your code must leave the tape seeked to some arbitrary register."
+  "Seek from memory to a register, run some code, and then seek back
+   to the first cell of memory.
+   Your code must leave the tape pointed to any arbitrary register."
   [r & code]
   (str (seek-mem-to-reg r) (deep-str code) seek-reg-to-mem))
 
