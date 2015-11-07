@@ -27,18 +27,20 @@
 
 (defn add-bf
   "Sum the return values of any number of code blocks and return the result.
-   This preserves the state of the preferred registers.
-   If the expressions modify the preferred registers, the changes will be lost."
+   This has a transparent effect on all registers except the return register,
+   meaning that the expressions may modify any registers they wish.
+   The expressions should leave the stack as they found it."
   [& expressions]
   (if (<= (count expressions) 1)
       (str (first expressions))
-      (str (push-stack preferred-reg-1)
-           (push-stack preferred-reg-2)
-           (first expressions)
+      (str (first expressions)
            (push-stack return-value-reg)
            (add-bf (rest expressions))
-           (pop-stack preferred-reg-1)
+           (push-stack preferred-reg-1)
+           (peak-stack preferred-reg-1 1)
+           (push-stack preferred-reg-2)
            (mov-reg preferred-reg-2 return-value-reg)
            (add-regs preferred-reg-1 preferred-reg-2 return-value-reg)
            (pop-stack preferred-reg-2)
-           (pop-stack preferred-reg-1))))
+           (pop-stack preferred-reg-1)
+           (pop-stack))))
