@@ -34,9 +34,21 @@
 (defn memwrite
   "Write a register to the current memory cell."
   [reg]
-  (str seek-mem-to-head ">>>[-]<<<"
+  (str seek-mem-to-head ">>[-]<<"
        (seek-mem-to-reg reg)
        (reg-to-scratch (dec scratch-size) (- scratch-size 2))
-       "[-" seek-reg-to-head ">>>+<<<" (seek-mem-to-reg reg) "]"
+       "[-" seek-reg-to-head ">>+<<" (seek-mem-to-reg reg) "]"
        (scratch-to-reg (dec scratch-size) false)
        seek-reg-to-mem))
+
+(defn- memtransfer
+  "Read the current memory cell into a register while simultaneously zeroing
+   the memory cell."
+  [reg]
+  (str (with-reg reg reset-current-reg)
+       seek-mem-to-head ">>[-<<" (seek-mem-to-reg reg) ">-<+" seek-reg-to-head ">>]<<"))
+
+(defn memread
+  "Read the current memory cell into a register."
+  [reg]
+  (str (memtransfer reg) (memwrite reg)))
