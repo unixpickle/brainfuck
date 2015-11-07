@@ -11,5 +11,26 @@
                                         (state-memseek-up %2))
                                    initial-state
                                    amounts)
-          actual (map :memory (map #(run-machine % "") programs))]
+          results (map #(run-machine % "") programs)
+          actual (map :memory results)
+          pointers (map :pointer results)
+          exp-pointer (+ 4 scratch-size (* 4 reg-count))]
+      (is (every? #(= % exp-pointer) pointers))
+      (are-states-equal actual expected))))
+
+(deftest memseek-down-test
+  (testing "memseek-down"
+    (let [init (str initialize-state (set-reg 1 5) (memseek-up 1))
+          programs (map #(str init (set-reg 2 %) (memseek-down 2))
+                        (range 10))
+          expected (map #(-> initial-state
+                             (state-set-reg 1 5)
+                             (state-set-reg 2 %)
+                             (state-memseek-abs (- 5 %)))
+                        (range 10))
+          results (map #(run-machine % "") programs)
+          actual (map :memory results)
+          pointers (map :pointer results)
+          exp-pointer (+ 4 scratch-size (* 4 reg-count))]
+      (is (every? #(= % exp-pointer) pointers))
       (are-states-equal actual expected))))

@@ -50,7 +50,7 @@
 (defn state-memseek-up
   [state amount]
   (loop [i (+ 7 scratch-size (* 4 (inc reg-count))) s state c amount]
-    (cond (= 0 c) s
+    (cond (<= c 0) s
           (= 1 (state-read-byte s i)) (recur (+ i 4) s c)
           :else (recur (+ i 4) (state-write-byte s i 1) (dec c)))))
 

@@ -14,7 +14,7 @@
    The seek will not go past the beginning of memory."
   [reg]
   (str (seek-mem-to-reg reg)
-       (reg-to-scratch (dec scratch-size) (- scratch-size 1))
+       (reg-to-scratch (dec scratch-size) (- scratch-size 2))
        "[-" seek-reg-to-mem ">>>>>>>>>>>[>>>>]<<<<[-]<<<" (seek-mem-to-reg reg) "]"
        (scratch-to-reg (dec scratch-size) false)
        seek-reg-to-mem))
