@@ -107,13 +107,3 @@
   "Set the value of a register to a hard-coded number."
   [reg val]
   (with-reg reg reset-current-reg (short-add-code (mod val 256))))
-
-(defn inc-reg
-  "Increment the given register."
-  [reg]
-  (with-reg reg inc-current-reg))
-
-(defn dec-reg
-  "Decrement the given register."
-  [reg]
-  (with-reg reg dec-current-reg))
