@@ -1,5 +1,13 @@
 (ns brainfuck.compiler-test)
 
+(defn reduce-results
+  "This works similarly to reduce, but it returns a list with each result
+   of the function."
+  [f start coll]
+  (rest (reduce #(concat %1 (list (f (last %1) %2)))
+                (list start)
+                coll)))
+
 (def initial-state
   (let [regs (apply concat (repeat reg-count '(0 256 1 2)))
         prefix (repeat (+ 4 scratch-size) 0)
@@ -31,6 +39,24 @@
     (if (= 0 (state-read-byte state i))
         (-> state (state-write-byte i 1) (state-write-byte (dec i) val))
         (recur (+ i 4)))))
+
+(defn state-memseek-zero
+  [state]
+  (loop [i (+ 7 scratch-size (* 4 (inc reg-count))) s state]
+    (if (= 0 (state-read-byte s i))
+        s
+        (recur (+ i 4) (state-write-byte s i 0)))))
+
+(defn state-memseek-up
+  [state amount]
+  (loop [i (+ 7 scratch-size (* 4 (inc reg-count))) s state c amount]
+    (cond (= 0 c) s
+          (= 1 (state-read-byte s i)) (recur (+ i 4) s c)
+          :else (recur (+ i 4) (state-write-byte s i 1) (dec c)))))
+
+(defn state-memseek-abs
+  [state index]
+  (-> state (state-memseek-zero) (state-memseek-up index)))
 
 (defn states-equal
   [s1 s2]
