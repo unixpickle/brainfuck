@@ -48,5 +48,5 @@
   [lisp-code]
   (binding [*ns* *ns*]
     (in-ns 'brainfuck.compiler)
-    (let [parsed (read-string (str "(brainfuck.compiler/finalize-program " lisp-code ")"))]
+    (let [parsed (read-string (str "(brainfuck.compiler/finalize-program " lisp-code "\n)"))]
       (eval parsed))))
