@@ -7,4 +7,5 @@
 (def initialize-state @#'brainfuck.compiler/initialize-state)
 
 (load "compiler_test_util" "compiler_test_regs" "compiler_test_stack"
-      "compiler_test_mem" "compiler_test_flow" "compiler_test_math")
+      "compiler_test_mem" "compiler_test_flow" "compiler_test_math"
+      "compiler_test_io")

@@ -22,7 +22,7 @@
 (def scratch-reg-2 (- reg-count 3))
 
 (load "compiler_util" "compiler_regs" "compiler_stack" "compiler_mem" "compiler_flow"
-      "compiler_math")
+      "compiler_math" "compiler_io")
 
 (def ^:private initialize-state
   "Initialize the state of the machine.
