@@ -14,12 +14,7 @@
   "Sum two registers and save the result in a third register.
    This will not modify any registers besides the sum register."
   [r1 r2 sum]
-  (str (set-reg sum 0)
-       (push-stack r1)
-       (while-reg r1
-                  (dec-reg r1)
-                  (inc-reg sum))
-       (pop-stack r1)
+  (str (mov-reg sum r1)
        (push-stack r2)
        (while-reg r2
                   (dec-reg r2)
