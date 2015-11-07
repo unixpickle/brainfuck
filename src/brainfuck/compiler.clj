@@ -17,8 +17,8 @@
 (def scratch-size 5)
 (def reg-count 10)
 (def return-value-reg (dec reg-count))
-(def preferred-reg-1 (- reg-count 2))
-(def preferred-reg-2 (- reg-count 2))
+(def scratch-reg-1 (- reg-count 2))
+(def scratch-reg-2 (- reg-count 3))
 
 (load "compiler_util" "compiler_regs" "compiler_stack" "compiler_mem" "compiler_flow"
       "compiler_math")
