@@ -4,4 +4,4 @@
             [brainfuck.interpreter :refer :all]))
 
 (load "compiler_test_util" "compiler_test_regs" "compiler_test_stack"
-      "compiler_test_mem")
+      "compiler_test_mem" "compiler_test_flow")

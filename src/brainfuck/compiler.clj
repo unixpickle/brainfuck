@@ -16,6 +16,7 @@
 
 (def scratch-size 5)
 (def reg-count 10)
+(def return-value-reg (dec reg-count))
 
 (load "compiler_util" "compiler_regs" "compiler_stack" "compiler_mem" "compiler_flow"
       "compiler_math")
