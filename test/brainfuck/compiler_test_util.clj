@@ -12,7 +12,7 @@
   (let [regs (apply concat (repeat reg-count '(0 256 1 2)))
         prefix (repeat (+ 4 scratch-size) 0)
         suffix '(0 2)]
-    (concat prefix regs suffix)))
+    (vec (concat prefix regs suffix))))
 
 (defn state-write-byte
   [state idx val]
@@ -31,7 +31,7 @@
 (defn state-set-reg
   [state idx val]
   (let [regIdx (+ 4 scratch-size (* 4 idx))]
-    (assoc (vec state) regIdx val (inc regIdx) (- 256 val))))
+    (assoc state regIdx val (inc regIdx) (- 256 val))))
 
 (defn state-push-stack
   [state val]

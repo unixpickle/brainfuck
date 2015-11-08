@@ -63,3 +63,26 @@
               (pop-stack a))
          (str (set-reg quotient 0)
               (set-reg modulus 0))))
+
+(defn equal-bf
+  "Return a non-zero value if all blocks return the same value.
+   This will mess with the scratch variables (possibly between block calls)."
+  [& blocks]
+  (cond (< (count blocks) 2) (return-num 1)
+        (= (count blocks) 2) (str (first blocks)
+                                  (push-stack return-value-reg)
+                                  (second blocks)
+                                  (mov-reg scratch-reg-2 return-value-reg)
+                                  (pop-stack scratch-reg-1)
+                                  (while-reg scratch-reg-1
+                                             (dec-reg scratch-reg-1)
+                                             (dec-reg scratch-reg-2))
+                                  (if-bf (return-reg scratch-reg-2)
+                                         (set-reg scratch-reg-1 0)
+                                         (set-reg scratch-reg-1 1))
+                                  (return-reg scratch-reg-1))
+        :else (str (if-bf (apply equal-bf (rest blocks))
+                          (str (apply equal-bf (take 2 blocks))
+                               (mov-reg scratch-reg-1 return-value-reg))
+                          (set-reg scratch-reg-1 0))
+                   (return-reg scratch-reg-1))))

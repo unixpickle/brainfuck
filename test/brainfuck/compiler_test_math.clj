@@ -50,3 +50,20 @@
                         numerators denominators quotients moduli)
           actual (map :memory (map #(run-machine % "") programs))]
       (are-states-equal actual expected))))
+
+(deftest equal-bf-test
+  (testing "equal-bf"
+    (let [nums [[10] [10 10] [15 10] [10 15] [10 10 20] [10 5 5] [129 129 129] [255 255 255]
+                [1 1 1 1 1 2] [1 1 1 1] [0 0] [0] [] [0 0 0 0] [0 0 1 0]]
+          equal-push (map #(str (apply equal-bf (map return-num %))
+                                (push-stack return-value-reg))
+                          nums)
+          program (deep-str initialize-state
+                            equal-push
+                            (set-reg scratch-reg-1 0)
+                            (set-reg scratch-reg-2 0)
+                            (set-reg return-value-reg 0))
+          true-vals (map #(if (zero? (count %)) 1 (if (apply = %) 1 0)) nums)
+          expected (reduce #(state-push-stack %1 %2) initial-state true-vals)
+          actual (:memory (run-machine program ""))]
+      (is (states-equal actual expected)))))
