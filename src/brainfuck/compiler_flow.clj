@@ -1,6 +1,6 @@
 (ns brainfuck.compiler)
 
-(defn- while-reg
+(defn while-reg
   "Run some code while the given register is not 0."
   [reg & body]
   (deep-str (seek-mem-to-reg reg) "[" seek-reg-to-mem

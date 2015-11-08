@@ -68,6 +68,8 @@
           \] (if (= 0 (read-memory memory pointer))
                  (recur tokens (inc ip) memory pointer input cache)
                  (recur tokens (get cache ip) memory pointer input cache))
+          \# (do (println memory)
+                 (recur tokens (inc ip) memory pointer input cache))
           (recur tokens (inc ip) memory pointer input cache))))
 
 (defn run-machine
