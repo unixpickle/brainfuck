@@ -24,14 +24,12 @@
                    if-body
                    (set-reg return-value-reg 0))))
   ([condition if-body else-body]
-   (str (set-reg return-value-reg 1)
-        (push-stack return-value-reg)
+   (str (push-small-value-stack 1)
         condition
         (while-reg return-value-reg
                    if-body
-                   (pop-stack return-value-reg)
-                   (set-reg return-value-reg 0)
-                   (push-stack return-value-reg))
+                   (pop-stack)
+                   (push-small-value-stack 0))
         (pop-stack return-value-reg)
         (while-reg return-value-reg
                    else-body

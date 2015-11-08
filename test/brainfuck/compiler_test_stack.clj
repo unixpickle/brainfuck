@@ -1,5 +1,7 @@
 (ns brainfuck.compiler-test)
 
+(def push-small-value-stack #'brainfuck.compiler/push-small-value-stack)
+
 (deftest push-stack-test
   (testing "push-stack"
     (let [program (deep-str initialize-state
@@ -12,6 +14,17 @@
                         (state-set-reg 1 17)
                         (state-set-reg 2 20))
           expected (reduce state-push-stack reg-state [100 17 20 17 100])
+          result (run-machine program "")
+          actual (:memory result)
+          pointer (:pointer result)]
+        (is (= pointer (+ 4 scratch-size (* 4 (+ 5 reg-count)))))
+        (is (states-equal actual expected)))))
+
+(deftest push-small-value-stack-test
+  (testing "push-small-value-stack"
+    (let [program (deep-str initialize-state
+                            (map push-small-value-stack [100 17 20 17 100]))
+          expected (reduce state-push-stack initial-state [100 17 20 17 100])
           result (run-machine program "")
           actual (:memory result)
           pointer (:pointer result)]

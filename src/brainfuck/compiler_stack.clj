@@ -9,6 +9,11 @@
        (scratch-to-reg (dec scratch-size) false)
        seek-reg-to-mem ">[>>>>]+<"))
 
+(defn- push-small-value-stack
+  "Push a small value (e.g. 1 or 2) to the stack."
+  [value]
+  (deep-str ">--[++<<<<--]++>>>>[>>>>]+<" (repeat value "+")))
+
 (def ^:private seek-last-stack-entry
   "Seek from the beginning of memory to the last entry of the stack.
    If the stack has no entries, this goes to the first usable memory cell."
