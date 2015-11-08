@@ -112,3 +112,17 @@
    This will mess with the scratch registers."
   [a b]
   (less-than-bf b a))
+
+(defn logical-or-bf
+  "Perform a logical OR on two expressions, returning a non-zero value if any
+   of the input values were non-zero.
+   This will mess with the scratch registers (possibly between block calls)."
+  [v1 & vs]
+  (if (zero? (count vs))
+      v1
+      (str (set-reg scratch-reg-1 0)
+           (if-bf v1
+                  (set-reg scratch-reg-1 1)
+                  (str (apply logical-or-bf vs)
+                       (mov-reg scratch-reg-1 return-value-reg)))
+           (return-reg scratch-reg-1))))

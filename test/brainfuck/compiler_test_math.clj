@@ -84,3 +84,18 @@
           expected (reduce #(state-push-stack %1 %2) initial-state true-vals)
           actual (:memory (run-machine program ""))]
       (is (states-equal actual expected)))))
+
+(deftest logical-or-bf-test
+  (testing "logical-or-bf"
+    (let [args [[128] [10 10] [255 0] [0 0] [0 15] [0 0 1] [0 0 0] [3 0 0] [0] [0 0 3 0 0 0]]
+          results [128 1 1 0 15 1 0 1 0 1]
+          or-push (map #(str (apply logical-or-bf (map return-num %))
+                             (push-stack return-value-reg))
+                             args)
+          program (deep-str initialize-state
+                            or-push
+                            (set-reg scratch-reg-1 0)
+                            (set-reg return-value-reg 0))
+          expected (reduce #(state-push-stack %1 %2) initial-state results)
+          actual (:memory (run-machine program ""))]
+      (is (states-equal actual expected)))))
