@@ -29,6 +29,7 @@
         (while-reg return-value-reg
                    if-body
                    (pop-stack)
+                   (set-reg return-value-reg 0)
                    (push-small-value-stack 0))
         (pop-stack return-value-reg)
         (while-reg return-value-reg
