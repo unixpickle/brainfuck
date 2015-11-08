@@ -66,5 +66,5 @@ memseek-zero
                       (memseek-up-bf (return-num 1)))))
 
 (if-bf (return-reg 6)
-       (print-string "Not square\n")
-       (print-string "Square\n"))
+       (print-string "Not power of 2\n")
+       (print-string "Power of 2\n"))

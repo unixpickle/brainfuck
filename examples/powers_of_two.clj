@@ -1,4 +1,4 @@
-(print-string "hi\n")
+(print-string "2^n:\n")
 
 (set-reg 0 1)
 (set-reg 3 10)
