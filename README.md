@@ -1,8 +1,8 @@
 # brainfuck
 
-[Brainfuck](https://en.wikipedia.org/wiki/Brainfuck) is very well-named esoteric programming language. At first I thought the name was a joke, but it's really a warning.
+[Brainfuck](https://en.wikipedia.org/wiki/Brainfuck) is a very well-named esoteric programming language. At first I thought the name was a joke, but it's really a warning.
 
-The second I started playing with Brainfuck, I knew I couldn't stop until I was **certain** that I could write anything in it. Thus, to free myself from my self-imposed Brainfuck dungeon, I created a high-level programming language that compiles to Brainfuck. For a sample program in this language, checkout [is_power_of_two.clj](examples/is_power_of_two.clj).
+The second I started playing with Brainfuck, I knew I couldn't stop until I was **certain** that I could write anything in it. To free myself from my self-imposed Brainfuck dungeon, I created a high-level programming language that compiles to Brainfuck. For a sample program in this language, checkout [is_power_of_two.clj](examples/is_power_of_two.clj).
 
 ## Usage
 
