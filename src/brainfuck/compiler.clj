@@ -33,13 +33,6 @@
             (repeat (dec reg-count) "<<<<") "<]"
             ">>" (repeat reg-count "+>++>>>") "<++<"))
 
-(defn- remove-seek-redundancies
-  [code]
-  (let [reduced (clojure.string/replace code #"(<>|><)" "")]
-    (if (< (count reduced) (count code))
-        (recur reduced)
-        code)))
-
 (defn finalize-program
   [& s]
   (remove-seek-redundancies (deep-str initialize-state s)))

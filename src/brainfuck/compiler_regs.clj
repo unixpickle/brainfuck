@@ -94,27 +94,35 @@
                 ">>[-<<+>>]+>+[>>>>]++<<<")))
 
 (defn- add-product-reg
-  "Adds the product of two integers the current register.
+  "Add or subtract the product of two integers to the current register.
    This assumes that the register will not overflow."
-  [big small]
-  (deep-str ">>" (repeat (- big 1) "+")
-            "[-<<" (repeat small "+") ">" (repeat small "-") ">]+<<"))
+  [big small negative]
+  (let [op1 (if negative "-" "+")
+        op2 (if negative "+" "-")]
+    (deep-str ">>" (repeat (- big 1) "+")
+              "[-<<" (repeat small op1) ">" (repeat small op2) ">]+<<")))
 
 (defn- short-add-code
-  "Add an integer to the current register.
+  "Add or subtract an integer to the current register.
    This assumes that the register will not overflow."
-  [n]
+  [n negative]
   (if (zero? n)
-      (deep-str ">" (repeat n "-") "<" (repeat n "+"))
-      (let [naive-code (deep-str ">" (repeat n "-") "<" (repeat n "+"))
+      ""
+      (let [op1 (if negative "+" "-")
+            op2 (if negative "-" "+")
+            naive-code (deep-str ">" (repeat n op1) "<" (repeat n op2))
             big-factor (int (Math/sqrt (* 2 n)))
             small-factor (int (/ n big-factor))
-            code (str (add-product-reg big-factor small-factor)
-                      (short-add-code (- n (* big-factor small-factor))))
-            trimmed-code (clojure.string/replace code #"(<>|<<>>)" "")]
+            code (str (add-product-reg big-factor small-factor negative)
+                      (short-add-code (- n (* big-factor small-factor)) negative))
+            trimmed-code (remove-seek-redundancies code)]
         (first (sort-by count [naive-code trimmed-code])))))
 
 (defn set-reg
   "Set the value of a register to a hard-coded number."
-  [reg val]
-  (with-reg reg reset-current-reg (short-add-code (mod val 256))))
+  [reg signed-num]
+  (let [num (mod signed-num 256)
+        pos (with-reg reg reset-current-reg (short-add-code num false))
+        neg (with-reg reg ">[-<+>]<" (short-add-code (- 256 num) true))
+        options (map remove-seek-redundancies [pos neg])]
+    (first (sort-by count options))))
