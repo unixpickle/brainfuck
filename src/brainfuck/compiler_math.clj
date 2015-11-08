@@ -14,12 +14,16 @@
   "Sum two registers and save the result in a third register.
    This will not modify any registers besides the sum register."
   [r1 r2 sum]
-  (str (mov-reg sum r1)
-       (push-stack r2)
-       (while-reg r2
-                  (dec-reg r2)
-                  (inc-reg sum))
-       (pop-stack r2)))
+  (with-reg sum
+            reset-current-reg
+            (seek-between-regs sum r1)
+            (reg-to-scratch (dec scratch-size) (- scratch-size 2))
+            "[-" (seek-between-regs r1 sum) ">-<+" (seek-between-regs sum r1) "]"
+            (scratch-to-reg (dec scratch-size) false)
+            (seek-between-regs r1 r2)
+            (reg-to-scratch (dec scratch-size) (- scratch-size 2))
+            "[-" (seek-between-regs r2 sum) inc-current-reg (seek-between-regs sum r2) "]"
+            (scratch-to-reg (dec scratch-size) false)))
 
 (defn add-bf
   "Sum the return values of any number of code blocks and return the result.
