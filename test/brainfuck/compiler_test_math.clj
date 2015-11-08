@@ -67,3 +67,20 @@
           expected (reduce #(state-push-stack %1 %2) initial-state true-vals)
           actual (:memory (run-machine program ""))]
       (is (states-equal actual expected)))))
+
+(deftest less-than-bf-test
+  (testing "less-than-bf"
+    (let [lhs [10 0 5 16 20 255 255 255 254 0]
+          rhs [5 5 5 200 0 0 255 254 255 1]
+          check-push (map #(str (less-than-bf (return-num %1) (return-num %2))
+                                (push-stack return-value-reg))
+                          lhs rhs)
+          program (deep-str initialize-state
+                            check-push
+                            (set-reg scratch-reg-1 0)
+                            (set-reg scratch-reg-2 0)
+                            (set-reg return-value-reg 0))
+          true-vals (map #(if (< %1 %2) (- %2 %1) 0) lhs rhs)
+          expected (reduce #(state-push-stack %1 %2) initial-state true-vals)
+          actual (:memory (run-machine program ""))]
+      (is (states-equal actual expected)))))

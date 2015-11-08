@@ -66,7 +66,7 @@
 
 (defn equal-bf
   "Return a non-zero value if all blocks return the same value.
-   This will mess with the scratch variables (possibly between block calls)."
+   This will mess with the scratch registers (possibly between block calls)."
   [& blocks]
   (cond (< (count blocks) 2) (return-num 1)
         (= (count blocks) 2) (str (first blocks)
@@ -86,3 +86,29 @@
                                (mov-reg scratch-reg-1 return-value-reg))
                           (set-reg scratch-reg-1 0))
                    (return-reg scratch-reg-1))))
+
+(defn less-than-bf
+  "Return a non-zero value if the first block is less than the second block.
+   This assumes that both values are unsigned 8-bit integers.
+   This will mess with the scratch registers."
+  [a b]
+  (str b
+       (mov-reg scratch-reg-2 return-value-reg)
+       (if-bf (return-reg scratch-reg-2)
+              (str (push-stack scratch-reg-2)
+                   a
+                   (mov-reg scratch-reg-1 return-value-reg)
+                   (pop-stack scratch-reg-2)
+                   (while-reg scratch-reg-1
+                              (dec-reg scratch-reg-1)
+                              (dec-reg scratch-reg-2)
+                              (if-not-bf (return-reg scratch-reg-2)
+                                         (set-reg scratch-reg-1 0)))))
+       (return-reg scratch-reg-2)))
+
+(defn greater-than-bf
+  "Return a non-zero value if the first block is greater than the second block.
+   This assumes that both values are unsigned 8-bit integers.
+   This will mess with the scratch registers."
+  [a b]
+  (less-than-bf b a))
