@@ -76,11 +76,22 @@
 (defn mov-reg
   "Copy the value of the second register to the first register."
   [destination source]
-  (with-reg source
-            (reg-to-scratch (dec scratch-size) (- scratch-size 2))
-            (seek-between-regs source destination)
-            reset-current-reg
-            (scratch-to-reg (dec scratch-size))))
+  (if (< destination source)
+      (with-reg source
+                ">>->--<<<"
+                (seek-between-regs source destination)
+                reset-current-reg
+                ">>>-"
+                "[>>>>]<<<"
+                "[->>+>-[+<<<<-]+<<-<+>>>[>>>>]<<<]"
+                ">>[-<<+>>]+>+[+<<<<-]++>")
+      (with-reg destination
+                reset-current-reg
+                ">>>--<<<"
+                (seek-between-regs destination source)
+                ">>->-<<<"
+                "[->>+>[>>>>]<<-<+<-[+<<<<-]+<<<]"
+                ">>[-<<+>>]+>+[>>>>]++<<<")))
 
 (defn- add-product-reg
   "Adds the product of two integers the current register.
