@@ -123,6 +123,6 @@
   [reg signed-num]
   (let [num (mod signed-num 256)
         pos (with-reg reg reset-current-reg (short-add-code num false))
-        neg (with-reg reg ">[-<+>]<" (short-add-code (- 256 num) true))
+        neg (with-reg reg ">-[-<+>]+<" (short-add-code (- 255 num) true))
         options (map remove-seek-redundancies [pos neg])]
     (first (sort-by count options))))

@@ -6,7 +6,7 @@
   (str (seek-mem-to-reg reg)
        ">>->-<<<"
        "[->>+>[>>>>]>>[>>>>]<+<<<--[++<<<<--]++<<-[+<<<<-]+<<<]"
-       ">>[-<<+>>]+>+<<[>>>>]+<"))
+       ">>[-<<+>>]+>+<[>>>>]<[>>>>]+<"))
 
 (defn- push-small-value-stack
   "Push a small value (e.g. 1 or 2) to the stack."
