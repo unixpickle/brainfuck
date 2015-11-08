@@ -39,7 +39,7 @@ I wrote a program which prints powers of two in decimal. To run this, do the fol
     8192
     ...
 
-Notice that this program is not constrained to any particular bit size. It is operating directly on decimal "bignums", so it can go on forever.
+Notice that this program is not constrained to any particular integer size. It is operating directly on decimal "bignums", so it can go on forever.
 
 I also created a program which tells you if a decimal number is a power of two:
 
