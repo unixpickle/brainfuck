@@ -4,10 +4,9 @@
   "Create a new entry on the stack and copy a register's value to it."
   [reg]
   (str (seek-mem-to-reg reg)
-       (reg-to-scratch (dec scratch-size) (- scratch-size 2))
-       "[-" seek-reg-to-mem ">[>>>>]<+" (seek-mem-to-reg reg) "]"
-       (scratch-to-reg (dec scratch-size) false)
-       seek-reg-to-mem ">[>>>>]+<"))
+       ">>->-<<<"
+       "[->>+>[>>>>]>>[>>>>]<+<<<--[++<<<<--]++<<-[+<<<<-]+<<<]"
+       ">>[-<<+>>]+>+<<[>>>>]+<"))
 
 (defn- push-small-value-stack
   "Push a small value (e.g. 1 or 2) to the stack."
