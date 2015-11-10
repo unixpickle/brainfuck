@@ -42,6 +42,16 @@
   ([condition if-body] (if-bf condition "" if-body))
   ([condition if-body else-body] (if-bf condition else-body if-body)))
 
+(defn when-bf
+  "If a condition returns true, run zero or more blocks of code."
+  [condition & code]
+  (if-bf (deep-str code)))
+
+(defn when-not-bf
+  "If a condition returns false, run zero or more blocks of code."
+  [condition & code]
+  (if-not-bf (deep-str code)))
+
 (defn return-reg
   "Return the value of a register.
    This is equivalent to moving the register into the return value register."
