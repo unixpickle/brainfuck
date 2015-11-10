@@ -1,5 +1,6 @@
 (ns brainfuck.core
-  (:require (brainfuck interpreter compiler)))
+  (:require (brainfuck interpreter compiler))
+  (:gen-class))
 
 (def usage-str "Usage: lein run [<compile|interpret>] <file> [interpreter input]")
 
