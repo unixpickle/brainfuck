@@ -25,6 +25,7 @@ memseek-zero
 (while-reg 0
            (set-reg 1 0)
            (case-reg 0
+                     (int \-) (set-reg 1 1)
                      (int \+) (set-reg 1 2)
                      (int \<) (set-reg 1 3)
                      (int \>) (set-reg 1 4)
@@ -50,8 +51,8 @@ memseek-zero
        [idx]
        (str memseek-zero
             (memseek-up-bf (return-num idx))
-            (while-bf (memread)
-                      (memseek-up-bf 6))
+            (while-bf (equal-bf (return-num 0) (memread))
+                      (memseek-up-bf (return-num 6)))
             (memseek-down-bf (return-num 1))))
     (def bf-seek-to-code (bf-seek-marker 1))
     (def bf-seek-to-input (bf-seek-marker 3))
@@ -85,9 +86,9 @@ memseek-zero
                             (memseek-up-bf (return-num 6))
                             (memwrite-bf (return-num 1)))
                      ; TODO: implement [ and ] here.
-                     5 (print-bf (str bf-seek-to-tape
+                     7 (print-bf (str bf-seek-to-tape
                                       (memread)))
-                     6 (str bf-seek-to-input
+                     8 (str bf-seek-to-input
                             (memread 1)
                             bf-seek-to-tape
                             (memwrite 1)))
