@@ -64,30 +64,41 @@ memseek-zero
 (memread 0)
 
 (while-reg 0
+           bf-seek-to-tape
            (case-reg 0
-                     1 (str bf-seek-to-tape
-                            (memread 1)
+                     1 (str (memread 1)
                             (dec-reg 1)
                             (memwrite 1))
-                     2 (str bf-seek-to-tape
-                            (memread 1)
+                     2 (str (memread 1)
                             (inc-reg 1)
                             (memwrite 1))
-                     3 (str bf-seek-to-tape
-                            (memseek-up-bf (return-num 1))
+                     3 (str (memseek-up-bf (return-num 1))
                             (memwrite-bf (return-num 0))
                             ; NOTE: I overshoot so that "<" at the first cell works.
                             (memseek-down-bf (return-num 11))
                             (memseek-up-bf (return-num 5))
                             (memwrite-bf (return-num 1)))
-                     4 (str bf-seek-to-tape
-                            (memseek-up-bf (return-num 1))
+                     4 (str (memseek-up-bf (return-num 1))
                             (memwrite-bf (return-num 0))
                             (memseek-up-bf (return-num 6))
                             (memwrite-bf (return-num 1)))
-                     ; TODO: implement [ and ] here.
-                     7 (print-bf (str bf-seek-to-tape
-                                      (memread)))
+                     5 (str bf-seek-to-tape
+                            (if-not-bf (memread)
+                                       (str bf-seek-to-code
+                                            (set-reg 1 1)
+                                            (memseek-up-bf (return-num 1))
+                                            (memwrite-bf (return-num 0))
+                                            (memseek-up-bf (return-num 5))
+                                            (while-reg 1
+                                                       (memread 2)
+                                                       (case-reg 2
+                                                                 5 (inc-reg 1)
+                                                                 6 (dec-reg 1)
+                                                                 0 (set-reg 1 0))
+                                                       (memseek-up-bf (return-num 6)))
+                                            (memseek-down-bf (return-num 5))
+                                            (memwrite-bf (return-num 1)))))
+                     7 (print-bf (memread))
                      8 (str bf-seek-to-input
                             (memread 1)
                             bf-seek-to-tape
