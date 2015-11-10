@@ -63,3 +63,21 @@
    This is equivalent to setting the return value register to the given value."
   [value]
   (set-reg return-value-reg value))
+
+(declare equal-bf)
+
+(defn- case-scratch-1
+  ([] "")
+  ([else-case] else-case)
+  ([expr case] (if-bf (equal-bf (return-reg scratch-reg-1) expr) case))
+  ([expr case & cases] (if-bf (equal-bf (return-reg scratch-reg-1) expr)
+                              case
+                              (apply case-scratch-1 cases))))
+
+(defn case-bf
+  "Run different blocks of code depending on the result of an expression.
+   This will affect scratch registers."
+  [condition & args]
+  (str condition
+       (mov-reg scratch-reg-1 return-value-reg)
+       (apply case-scratch-1 args)))
