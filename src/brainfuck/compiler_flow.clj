@@ -66,19 +66,15 @@
 
 (declare equal-bf)
 
-(defn- case-scratch-1
-  ([] "")
-  ([else-case] else-case)
-  ([n case] (if-bf (equal-bf (return-reg scratch-reg-1) (return-num n))
-                   case))
-  ([n case & cases] (if-bf (equal-bf (return-reg scratch-reg-1) (return-num n)
-                           case
-                           (apply case-scratch-1 cases)))))
-
-(defn case-bf
-  "Run different blocks of code depending on the numerical result of an expression.
-   Each case runs on a pre-defined numerical value (except for an optional else case)."
-  [condition & args]
-  (str condition
-       (mov-reg scratch-reg-1 return-value-reg)
-       (apply case-scratch-1 args)))
+(defn case-reg
+  "Run different blocks of code depending on the numerical value of a register.
+   The register must not be a scratch register or the return value register.
+   This will mess with the scratch and return value registers."
+  ([reg case-code] case-code)
+  ([reg n case-code]
+   (if-bf (equal-bf (return-reg reg) (return-num n))
+          case-code))
+  ([reg n case-code & other]
+   (if-bf (equal-bf (return-reg reg) (return-num n))
+          case-code
+          (apply case-reg reg other))))
