@@ -68,6 +68,27 @@
          (str (set-reg quotient 0)
               (set-reg modulus 0))))
 
+(defn equal-regs
+  "Set a register to a non-zero value if two registers are equal, or a zero
+   value otherwise.
+   The result register may be one of the operand registers, and the operand registers
+   may be the same (although that seems pointless)."
+  [r1 r2 result]
+  (str (seek-mem-to-reg r1)
+       (reg-to-scratch (- scratch-size 5) (- scratch-size 4))
+       (seek-between-regs r1 r2)
+       (reg-to-scratch (- scratch-size 4) (- scratch-size 3))
+       "<<[<<<<]<<"
+       "<+<<+<<"
+       ; Current scratch layout is |a|b|1|0|1|.
+       ; We are pointed at a, and the third byte is our return value.
+       "[->>[-]<[->+>]>-[+>>-]+<<<<]"
+       ">[[-]>-<]>>>->"
+       (seek scratch-size (+ scratch-size 4 (* 4 result)))
+       reset-current-reg
+       (scratch-to-reg (- scratch-size 3))
+       seek-reg-to-mem))
+
 (defn equal-bf
   "Return a non-zero value if all blocks return the same value.
    This will mess with the scratch registers (possibly between block calls)."
@@ -76,15 +97,9 @@
         (= (count blocks) 2) (str (first blocks)
                                   (push-stack return-value-reg)
                                   (second blocks)
-                                  (mov-reg scratch-reg-2 return-value-reg)
                                   (pop-stack scratch-reg-1)
-                                  (while-reg scratch-reg-1
-                                             (dec-reg scratch-reg-1)
-                                             (dec-reg scratch-reg-2))
-                                  (if-bf (return-reg scratch-reg-2)
-                                         (set-reg scratch-reg-1 0)
-                                         (set-reg scratch-reg-1 1))
-                                  (return-reg scratch-reg-1))
+                                  (equal-regs scratch-reg-1 return-value-reg
+                                              return-value-reg))
         :else (str (if-bf (apply equal-bf (rest blocks))
                           (str (apply equal-bf (take 2 blocks))
                                (mov-reg scratch-reg-1 return-value-reg))

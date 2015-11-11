@@ -64,7 +64,7 @@
   [value]
   (set-reg return-value-reg value))
 
-(declare equal-bf)
+(declare equal-regs)
 
 (defn case-reg
   "Run different blocks of code depending on the numerical value of a register.
@@ -72,9 +72,11 @@
    This will mess with the scratch and return value registers."
   ([reg case-code] case-code)
   ([reg n case-code]
-   (if-bf (equal-bf (return-reg reg) (return-num n))
+   (if-bf (str (return-num n)
+               (equal-regs reg return-value-reg return-value-reg))
           case-code))
   ([reg n case-code & other]
-   (if-bf (equal-bf (return-reg reg) (return-num n))
+   (if-bf (str (return-num n)
+               (equal-regs reg return-value-reg return-value-reg))
           case-code
           (apply case-reg reg other))))
