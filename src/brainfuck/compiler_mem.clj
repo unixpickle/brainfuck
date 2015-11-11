@@ -9,6 +9,16 @@
        (scratch-to-reg (dec scratch-size) false)
        seek-reg-to-mem))
 
+(defn memseek-up-num
+  "Move the memory read/write head up by a pre-programmed number of bytes.
+   The supplied number of bytes (n) should be relatively small, since the
+   size of the output code is O(n)."
+  [n]
+  (deep-str ">--[++<<<<--]++"
+            ">>>>>>[>>>>]"
+            (repeat n "+>>>>")
+            ">"))
+
 (defn memseek-up-bf
   "Like memseek-up, but uses the return value of some code."
   [code]

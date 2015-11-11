@@ -18,6 +18,22 @@
       (is (every? #(= % exp-pointer) pointers))
       (are-states-equal actual expected))))
 
+(deftest memseek-up-num-test
+  (testing "memseek-up-num"
+    (let [actual (compounded-machines initialize-state
+                                      (memseek-up-num 1)
+                                      (memseek-up-num 2)
+                                      memseek-zero
+                                      (memseek-up-num 0)
+                                      (memseek-up-num 5))
+          expected (compounded-states initial-state
+                                      (state-memseek-up 1)
+                                      (state-memseek-up 2)
+                                      (state-memseek-zero)
+                                      (state-memseek-up 0)
+                                      (state-memseek-up 5))]
+      (are-states-equal actual expected))))
+
 (deftest memseek-down-test
   (testing "memseek-down"
     (let [init (str initialize-state (set-reg 1 5) (memseek-up 1))
