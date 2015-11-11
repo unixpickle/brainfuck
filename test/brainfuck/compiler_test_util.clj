@@ -74,3 +74,20 @@
 (defn are-states-equal
   [s1 s2]
   (dorun (map #(is (states-equal %1 %2)) s1 s2)))
+
+(defn compounded-machines
+  "Get the memory states of a brainfuck program at multiple points during its execution.
+   This returns an array of vectors (i.e. slices of memory).
+   The first returned vector is the result of running the initialization code
+   followed by the first command; the next is the result of the initialization
+   code followed by the first two commands; etc."
+  [init & commands]
+  (let [programs (map #(deep-str init (take (inc %) commands))
+                      (range (count commands)))]
+    (map #(:memory (run-machine % "")) programs)))
+
+(defmacro compounded-states
+  "Do what compounded-machines does, but for direct state manipulations."
+  [init & operations]
+  `(vector ~@(reduce-results #(concat [(first %2)] [%1] (rest %2))
+                             init operations)))
