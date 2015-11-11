@@ -42,10 +42,12 @@ memseek-zero
 
 ; Read the standard input.
 memseek-zero
+(memseek-up-bf (return-num 2))
 (read-char 0)
 (while-reg 0
            (memwrite 0)
-           (memseek-up-bf (return-num 6)))
+           (memseek-up-bf (return-num 6))
+           (read-char 0))
 
 (do (defn bf-seek-marker
        [idx]
@@ -119,6 +121,10 @@ memseek-zero
                      7 (print-bf (memread))
                      8 (str bf-seek-to-input
                             (memread 1)
+                            (memseek-up-bf (return-num 1))
+                            (memwrite-bf (return-num 0))
+                            (memseek-up-bf (return-num 6))
+                            (memwrite-bf (return-num 1))
                             bf-seek-to-tape
                             (memwrite 1)))
            bf-seek-to-code
