@@ -34,6 +34,17 @@
        (scratch-to-reg (dec scratch-size) false)
        seek-reg-to-mem))
 
+(defn memseek-down-num
+  "Move the memory read/write head down by a pre-programmed number of bytes.
+   Just like for memseek-up-num, the size of the generated code is O(n)
+   where n is the number of bytes to seek."
+  [n]
+  (deep-str ">--[++<<<<--]++>>>>>>"
+            (repeat n ">>>>")
+            "[>>>>]"
+            (repeat n "<<<<[-]")
+            ">"))
+
 (defn memseek-down-bf
   "Like memseek-down, but uses the return value of some code."
   [code]
