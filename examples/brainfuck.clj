@@ -62,15 +62,15 @@ memseek-zero
            (set-reg 1 1)
            (memseek-up 1)
            (memwrite-bf (return-num 0))
-           (memseek-up-bf (return-num 5))
+           (memseek-down 1)
            (while-reg 1
+                      (memseek-up-bf (return-num 6))
                       (memread 2)
                       (case-reg 2
                                 5 (inc-reg 1)
                                 6 (dec-reg 1)
-                                0 (set-reg 1 0))
-                      (memseek-up-bf (return-num 6)))
-           (memseek-down-bf (return-num 5))
+                                0 (set-reg 1 0)))
+           (memseek-up-bf (return-num 1))
            (memwrite-bf (return-num 1))))
     (def bf-seek-to-loop-start
       (str bf-seek-to-code
