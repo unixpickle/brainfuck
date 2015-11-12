@@ -133,8 +133,8 @@
   (less-than-bf b a))
 
 (defn logical-or-bf
-  "Perform a logical OR on two expressions, returning a non-zero value if any
-   of the input values were non-zero.
+  "Perform a logical OR on one or more expressions.
+   This will return a non-zero value if any of the input values were non-zero.
    This will mess with the scratch registers (possibly between block calls)."
   [v1 & vs]
   (if (zero? (count vs))
