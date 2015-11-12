@@ -13,11 +13,11 @@
 
 ; Set the cur_code, cur_input, and cur_tape bytes.
 (memseek-up-num 1)
-(memwrite-bf (return-num 1))
+(memwrite-num 1)
 (memseek-up-num 2)
-(memwrite-bf (return-num 1))
+(memwrite-num 1)
 (memseek-up-num 2)
-(memwrite-bf (return-num 1))
+(memwrite-num 1)
 memseek-zero
 
 ; Read the code input.
@@ -33,12 +33,12 @@ memseek-zero
                      (int \]) (set-reg 1 6)
                      (int \.) (set-reg 1 7)
                      (int \,) (set-reg 1 8))
-           (if-bf (equal-bf (return-reg 0) (return-num (int \!)))
-                  (set-reg 0 0)
-                  (str (read-char 0)
-                       (if-bf (return-reg 1)
-                              (str (memwrite 1)
-                                   (memseek-up-num 6))))))
+           (case-reg 0
+                     (int \!) (set-reg 0 0)
+                     (str (read-char 0)
+                          (if-bf (return-reg 1)
+                                 (str (memwrite 1)
+                                      (memseek-up-num 6))))))
 
 ; Read the standard input.
 memseek-zero
@@ -63,7 +63,7 @@ memseek-zero
       (str bf-seek-to-code
            (set-reg 1 1)
            (memseek-up-num 1)
-           (memwrite-bf (return-num 0))
+           (memwrite-num 0)
            (memseek-down-num 1)
            (while-reg 1
                       (memseek-up-num 6)
@@ -73,12 +73,12 @@ memseek-zero
                                 6 (dec-reg 1)
                                 0 (set-reg 1 0)))
            (memseek-up-num 1)
-           (memwrite-bf (return-num 1))))
+           (memwrite-num 1)))
     (def bf-seek-to-loop-start
       (str bf-seek-to-code
            (set-reg 1 1)
            (memseek-up-num 1)
-           (memwrite-bf (return-num 0))
+           (memwrite-num 0)
            (memseek-down-num 1)
            (while-reg 1
                       (memseek-down-num 6)
@@ -88,7 +88,7 @@ memseek-zero
                                 5 (dec-reg 1)
                                 0 (set-reg 1 0)))
            (memseek-up-num 1)
-           (memwrite-bf (return-num 1))))
+           (memwrite-num 1)))
     "")
 
 ; Execute the code!
@@ -105,15 +105,15 @@ memseek-zero
                             (inc-reg 1)
                             (memwrite 1))
                      3 (str (memseek-up-num 1)
-                            (memwrite-bf (return-num 0))
+                            (memwrite-num 0)
                             ; NOTE: I overshoot so that "<" at the first cell works.
                             (memseek-down-num 11)
                             (memseek-up-num 5)
-                            (memwrite-bf (return-num 1)))
+                            (memwrite-num 1))
                      4 (str (memseek-up-num 1)
-                            (memwrite-bf (return-num 0))
+                            (memwrite-num 0)
                             (memseek-up-num 6)
-                            (memwrite-bf (return-num 1)))
+                            (memwrite-num 1))
                      5 (if-not-bf (memread)
                                   bf-seek-to-loop-end)
                      6 (if-bf (memread)
@@ -122,15 +122,15 @@ memseek-zero
                      8 (str bf-seek-to-input
                             (memread 1)
                             (memseek-up-num 1)
-                            (memwrite-bf (return-num 0))
+                            (memwrite-num 0)
                             (memseek-up-num 6)
-                            (memwrite-bf (return-num 1))
+                            (memwrite-num 1)
                             bf-seek-to-tape
                             (memwrite 1)))
            bf-seek-to-code
            (memseek-up-num 1)
-           (memwrite-bf (return-num 0))
+           (memwrite-num 0)
            (memseek-up-num 6)
-           (memwrite-bf (return-num 1))
+           (memwrite-num 1)
            (memseek-down-num 1)
            (memread 0))
