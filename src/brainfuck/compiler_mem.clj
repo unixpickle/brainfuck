@@ -72,6 +72,32 @@
        (scratch-to-reg (dec scratch-size) false)
        seek-reg-to-mem))
 
+(defn- add-square-mem
+  "Add the square of an integer to the current memory cell."
+  [n]
+  (deep-str ">" (repeat n "+")
+            "[-<" (repeat n "+") ">]<"))
+
+(defn- short-add-code-mem
+  "Add an integer to the current memory cell."
+  [n]
+  (if (zero? n)
+      ""
+      (let [naive-code (deep-str (repeat n "+"))
+            sqrt (int (Math/sqrt n))
+            code (str (add-square-mem sqrt)
+                      (short-add-code-mem (- n (* sqrt sqrt))))
+            trimmed-code (remove-seek-redundancies code)]
+        (first (sort-by count [naive-code trimmed-code])))))
+
+(defn memwrite-num
+  "Write a pre-programmed value into the current memory cell."
+  [n]
+  (str seek-mem-to-head
+       ">>[-]"
+       (short-add-code-mem n)
+       "<<"))
+
 (defn memwrite-bf
   "Run some code and write it's return value to memory."
   [code]

@@ -119,6 +119,30 @@
       (is (= pointer exp-pointer))
       (is (states-equal actual expected)))))
 
+(deftest memwrite-num-test
+  (testing "memwrite-num"
+    (let [actual (compounded-machines initialize-state
+                                      (memwrite-num 10)
+                                      (memwrite-num 100)
+                                      (memseek-up-num 1)
+                                      (memwrite-num 5)
+                                      (memseek-down-num 1)
+                                      (memwrite-num 0)
+                                      (memseek-up-num 10)
+                                      (memwrite-num 255)
+                                      (memwrite-num 123))
+          expected (compounded-states initial-state
+                                      (state-memwrite 10)
+                                      (state-memwrite 100)
+                                      (state-memseek-up 1)
+                                      (state-memwrite 5)
+                                      (state-memseek-zero)
+                                      (state-memwrite 0)
+                                      (state-memseek-up 10)
+                                      (state-memwrite 255)
+                                      (state-memwrite 123))]
+      (are-states-equal actual expected))))
+
 (deftest memread-test
   (testing "memread"
     (let [program (str initialize-state

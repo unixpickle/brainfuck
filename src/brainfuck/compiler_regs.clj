@@ -102,7 +102,7 @@
     (deep-str ">>" (repeat (- big 1) "+")
               "[-<<" (repeat small op1) ">" (repeat small op2) ">]+<<")))
 
-(defn- short-add-code
+(defn- short-add-code-reg
   "Add or subtract an integer to the current register.
    This assumes that the register will not overflow."
   [n negative]
@@ -114,7 +114,7 @@
             big-factor (int (Math/sqrt (* 2 n)))
             small-factor (int (/ n big-factor))
             code (str (add-product-reg big-factor small-factor negative)
-                      (short-add-code (- n (* big-factor small-factor)) negative))
+                      (short-add-code-reg (- n (* big-factor small-factor)) negative))
             trimmed-code (remove-seek-redundancies code)]
         (first (sort-by count [naive-code trimmed-code])))))
 
@@ -122,7 +122,7 @@
   "Set the value of a register to a hard-coded number."
   [reg signed-num]
   (let [num (mod signed-num 256)
-        pos (with-reg reg reset-current-reg (short-add-code num false))
-        neg (with-reg reg ">-[-<+>]+<" (short-add-code (- 255 num) true))
+        pos (with-reg reg reset-current-reg (short-add-code-reg num false))
+        neg (with-reg reg ">-[-<+>]+<" (short-add-code-reg (- 255 num) true))
         options (map remove-seek-redundancies [pos neg])]
     (first (sort-by count options))))
