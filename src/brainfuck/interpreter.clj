@@ -30,12 +30,12 @@
 (defn- pad-zeroes
   [m addr]
   (if (<= (count m) addr)
-      (recur (conj m 0) addr)
+      (recur (conj! m 0) addr)
       m))
 
 (defn- write-memory
   [m addr value]
-  (assoc (pad-zeroes m addr) addr value))
+  (assoc! (pad-zeroes m addr) addr value))
 
 (defn- read-memory
   [m addr]
@@ -49,7 +49,7 @@
   [tokens ip memory pointer input cache]
   (let [inst (get tokens ip)]
     (case inst
-          nil {:memory memory :pointer pointer}
+          nil {:memory (persistent! memory) :pointer pointer}
           \> (recur tokens (inc ip) memory (inc pointer) input cache)
           \< (recur tokens (inc ip) memory (dec pointer) input cache)
           \+ (recur tokens (inc ip) (add-memory memory pointer 1) pointer input cache)
@@ -74,4 +74,4 @@
 
 (defn run-machine
   [code input]
-  (machine-loop code 0 [] 0 input (matching-cache code)))
+  (machine-loop code 0 (transient []) 0 input (matching-cache code)))
