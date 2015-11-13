@@ -10,7 +10,7 @@
       (println usage-str)
       (let [contents (slurp (first args))
             input (apply str (rest args))]
-        (brainfuck.interpreter/run-machine contents input))))
+        (brainfuck.interpreter/run-machine-jit contents input))))
 
 (defn compiler
   ([& args]
