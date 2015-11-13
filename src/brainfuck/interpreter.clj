@@ -1,77 +1,45 @@
 (ns brainfuck.interpreter)
 
-(defn- matching-bracket
-  [tokens startIndex direction]
-  (loop [i startIndex c 0]
-    (let [chr (get tokens i)]
-      (assert (not (= chr nil)))
-      (cond (= chr \[) (if (= c -1) (inc i) (recur (direction i) (inc c)))
-            (= chr \]) (if (= c 1) (inc i) (recur (direction i) (dec c)))
-            :else (recur (direction i) c)))))
+(load "interpreter_ops")
 
-(defn- matching-close
-  [tokens openIndex]
-  (matching-bracket tokens openIndex inc))
+(defn- read-until-close-bracket
+  ([s]
+   (read-until-close-bracket s [] 1))
+  ([s accumulator depth]
+   (assert (not (empty? s)) "missing ]")
+   (case (first s)
+         \] (if (= depth 1)
+                [(apply str accumulator) (apply str (rest s))]
+                (recur (rest s) (conj accumulator \]) (dec depth)))
+         \[ (recur (rest s) (conj accumulator \[) (inc depth))
+         (recur (rest s) (conj accumulator (first s)) depth))))
 
-(defn- matching-open
-  [tokens closeIndex]
-  (matching-bracket tokens closeIndex dec))
+(defn- compile-code
+  ([code]
+   (compile-code code []))
+  ([code acc]
+   (case (first code)
+         nil (seq acc)
+         \[ (let [[body remaining] (read-until-close-bracket (rest code))
+                  loop-code (loop-ops (compile-code body))]
+              (recur remaining (conj acc loop-code)))
+         \+ (recur (rest code) (conj acc '(add 1)))
+         \- (recur (rest code) (conj acc '(add -1)))
+         \> (recur (rest code) (conj acc '(seek 1)))
+         \< (recur (rest code) (conj acc '(seek -1)))
+         \. (recur (rest code) (conj acc '(write-char)))
+         \, (recur (rest code) (conj acc '(read-char)))
+         (recur (rest code) acc))))
 
-(defn- matching-cache
-  [tokens]
-  (loop [v (vec (repeat (count tokens) 0)) i 0]
-    (if (= i (count tokens))
-        v
-        (case (get tokens i)
-              \[ (recur (assoc v i (matching-close tokens i)) (inc i))
-              \] (recur (assoc v i (matching-open tokens i)) (inc i))
-              (recur v (inc i))))))
-
-(defn- pad-zeroes
-  [m addr]
-  (if (<= (count m) addr)
-      (recur (conj! m 0) addr)
-      m))
-
-(defn- write-memory
-  [m addr value]
-  (assoc! (pad-zeroes m addr) addr value))
-
-(defn- read-memory
-  [m addr]
-  (or (get m addr) 0))
-
-(defn- add-memory
-  [m addr value]
-  (write-memory m addr (+ value (read-memory m addr))))
-
-(defn- machine-loop
-  [tokens ip memory pointer input cache]
-  (let [inst (get tokens ip)]
-    (case inst
-          nil {:memory (persistent! memory) :pointer pointer}
-          \> (recur tokens (inc ip) memory (inc pointer) input cache)
-          \< (recur tokens (inc ip) memory (dec pointer) input cache)
-          \+ (recur tokens (inc ip) (add-memory memory pointer 1) pointer input cache)
-          \- (recur tokens (inc ip) (add-memory memory pointer -1) pointer input cache)
-          \. (do
-               (print (char (read-memory memory pointer)))
-               (flush)
-               (recur tokens (inc ip) memory pointer input cache))
-          \, (if (empty? input)
-                 (recur tokens (inc ip) memory pointer input cache)
-                 (let [c (int (first input)) ni (rest input)]
-                   (recur tokens (inc ip) (write-memory memory pointer c) pointer ni cache)))
-          \[ (if (= 0 (read-memory memory pointer))
-                 (recur tokens (get cache ip) memory pointer input cache)
-                 (recur tokens (inc ip) memory pointer input cache))
-          \] (if (= 0 (read-memory memory pointer))
-                 (recur tokens (inc ip) memory pointer input cache)
-                 (recur tokens (get cache ip) memory pointer input cache))
-          \# (do (println pointer memory)
-                 (recur tokens (inc ip) memory pointer input cache))
-          (recur tokens (inc ip) memory pointer input cache))))
+(defn run-compiled-code
+  [instructions input]
+  (binding [*ns* *ns*]
+    (ns brainfuck.interpreter)
+    (eval (thread-ops instructions))
+    ((eval (thread-ops instructions)) [(transient []) 0 input])))
 
 (defn run-machine
   [code input]
-  (machine-loop code 0 (transient []) 0 input (matching-cache code)))
+  (let [c (compile-code code)
+        [mem pointer input] (run-compiled-code c input)]
+    {:memory (persistent! mem) :pointer pointer}))
