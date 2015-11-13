@@ -19,27 +19,24 @@
    (compile-code code []))
   ([code acc]
    (case (first code)
-         nil (seq acc)
+         nil (join-ops acc)
          \[ (let [[body remaining] (read-until-close-bracket (rest code))
-                  loop-code (loop-ops (compile-code body))]
+                  loop-code (loop-op (compile-code body))]
               (recur remaining (conj acc loop-code)))
-         \+ (recur (rest code) (conj acc '(add 1)))
-         \- (recur (rest code) (conj acc '(add -1)))
-         \> (recur (rest code) (conj acc '(seek 1)))
-         \< (recur (rest code) (conj acc '(seek -1)))
-         \. (recur (rest code) (conj acc '(write-char)))
-         \, (recur (rest code) (conj acc '(read-char)))
+         \+ (recur (rest code) (conj acc (partial add 1)))
+         \- (recur (rest code) (conj acc (partial add -1)))
+         \> (recur (rest code) (conj acc (partial seek 1)))
+         \< (recur (rest code) (conj acc (partial seek -1)))
+         \. (recur (rest code) (conj acc (partial write-char)))
+         \, (recur (rest code) (conj acc (partial read-char)))
          (recur (rest code) acc))))
 
-(defn run-compiled-code
-  [instructions input]
-  (binding [*ns* *ns*]
-    (ns brainfuck.interpreter)
-    (eval (thread-ops instructions))
-    ((eval (thread-ops instructions)) [(transient []) 0 input])))
+(defn run-op
+  [op input]
+  (op [(transient []) 0 input]))
 
 (defn run-machine
   [code input]
   (let [c (compile-code code)
-        [mem pointer input] (run-compiled-code c input)]
+        [mem pointer input] (run-op c input)]
     {:memory (persistent! mem) :pointer pointer}))

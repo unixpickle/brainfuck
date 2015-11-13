@@ -38,18 +38,17 @@
       (flush)
       [memory pointer input]))
 
-(defn- reverse-apply
-  [a b]
-  (b a))
+(defn- join-ops
+  [ops]
+  (fn [state]
+      (loop [s state o ops]
+        (if (empty? o)
+            s
+            (recur ((first o) s) (rest o))))))
 
-(defn- thread-ops
-  [instructions]
-  (let [funcs (vec (map #(cons `partial %) instructions))]
-    `(fn [state#] (reduce ~reverse-apply state# ~funcs))))
-
-(defn- loop-ops
-  [instructions]
-  `((fn [[mem# pointer# input#]]
-        (if (not (= 0 (read-memory mem# pointer#)))
-            (recur (~(thread-ops instructions) [mem# pointer# input#]))
-            [mem# pointer# input#]))))
+(defn- loop-op
+  [op]
+  (fn [[mem pointer input]]
+    (if (= 0 (read-memory mem pointer))
+        [mem pointer input]
+        (recur (op [mem pointer input])))))
